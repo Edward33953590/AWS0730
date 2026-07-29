@@ -75,7 +75,7 @@ def _check_blackwhitelist(user_id):
         return {
             'score': 100,
             'decision': 'BLOCK',
-            'reason': f'用户在黑名单�? {entry.reason}',
+            'reason': f'用户在黑名单中: {entry.reason}',
             'ai_explanation': None,
             'source': 'blacklist',
             'rule_triggered': 'R-5',
@@ -101,25 +101,25 @@ def _ai_risk_check(user_id, action, campaign_id):
         count_10s = _get_request_count(user_id, 10)
         count_60s = _get_request_count(user_id, 60)
 
-        prompt = f"""你是一个风控系统。请评估以下用户行为的风险等级�?
+        prompt = f"""你是一个风控系统。请评估以下用户行为的风险等级。
 用户行为数据:
 - 用户ID: {user_id}
 - 操作类型: {action}
-- 最�?0秒请求次�? {count_10s}
-- 最�?0秒请求次�? {count_60s}
+- 最近10秒请求次数: {count_10s}
+- 最近60秒请求次数: {count_60s}
 
 请以JSON格式返回评估结果:
 {{
-  "score": 0-100的风险评�?
-  "decision": "ALLOW"�?BLOCK"�?REVIEW",
+  "score": 0-100的风险评分,
+  "decision": "ALLOW"或"BLOCK"或"REVIEW",
   "reason": "简短的判断原因",
   "explanation": "详细的自然语言解释"
 }}
 
 评判标准:
-- 10秒内超过50次请�? 高风�?BLOCK)
-- 60秒内超过10次不同请�? 中风�?REVIEW)
-- 正常行为: 低风�?ALLOW)"""
+- 10秒内超过50次请求: 高风险(BLOCK)
+- 60秒内超过10次不同请求: 中风险(REVIEW)
+- 正常行为: 低风险(ALLOW)"""
 
         result, error = bedrock_service.generate_json(prompt)
         if error:
@@ -150,7 +150,7 @@ def _rule_engine_check(user_id, action):
             'score': 95,
             'decision': 'BLOCK',
             'reason': f'10秒内请求{count_10s}次，触发高频拦截规则',
-            'ai_explanation': f'该用户在过去10秒内发起了{count_10s}次请求，远超正常使用频率，判定为异常刷券行为�?,
+            'ai_explanation': f'该用户在过去10秒内发起了{count_10s}次请求，远超正常使用频率，判定为异常刷券行为。',
             'source': 'rule_engine',
             'rule_triggered': 'R-1',
         }
@@ -161,7 +161,7 @@ def _rule_engine_check(user_id, action):
             'score': 70,
             'decision': 'REVIEW',
             'reason': f'1分钟内请求{count_60s}次，需人工审核',
-            'ai_explanation': f'该用户在1分钟内频繁操作{count_60s}次，行为模式异常，建议人工审核�?,
+            'ai_explanation': f'该用户在1分钟内频繁操作{count_60s}次，行为模式异常，建议人工审核。',
             'source': 'rule_engine',
             'rule_triggered': 'R-2',
         }
@@ -175,8 +175,8 @@ def _rule_engine_check(user_id, action):
             return {
                 'score': 65,
                 'decision': 'REVIEW',
-                'reason': '新注册账号短时间内频繁领�?,
-                'ai_explanation': f'该用户注册仅{minutes_since_register:.0f}分钟，已发起{count_60s}次领券请求，存在刷券嫌疑�?,
+                'reason': '新注册账号短时间内频繁领券',
+                'ai_explanation': f'该用户注册仅{minutes_since_register:.0f}分钟，已发起{count_60s}次领券请求，存在刷券嫌疑。',
                 'source': 'rule_engine',
                 'rule_triggered': 'R-3',
             }
