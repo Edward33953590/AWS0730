@@ -391,13 +391,15 @@ def stats_export():
     from flask import Response
     from models.coupon import Coupon
     output = io.StringIO()
+    # Add UTF-8 BOM for Excel compatibility
+    output.write('\ufeff')
     writer = csv.writer(output)
-    writer.writerow(['coupon_code', 'campaign', 'user_id', 'status', 'claimed_at', 'expires_at'])
+    writer.writerow(['券码', '活动名称', '用户ID', '状态', '领取时间', '过期时间'])
     coupons = Coupon.query.order_by(Coupon.claimed_at.desc()).limit(1000).all()
     for c in coupons:
         writer.writerow([c.coupon_code, c.campaign.name if c.campaign else '', c.user_id, c.status, c.claimed_at.isoformat() if c.claimed_at else '', c.expires_at.isoformat() if c.expires_at else ''])
     output.seek(0)
-    return Response(output.getvalue(), mimetype='text/csv', headers={'Content-Disposition': 'attachment; filename=export.csv'})
+    return Response(output.getvalue().encode('utf-8'), mimetype='text/csv; charset=utf-8', headers={'Content-Disposition': 'attachment; filename=export.csv'})
 
 
 # ==================== Favorites API ====================
