@@ -94,6 +94,10 @@
             </div>
 
             <!-- AI Copy Preview -->
+            <div x-show="aiError" class="mb-6 bg-red-50 rounded-lg p-4 border border-red-200">
+                <label class="block text-sm font-medium text-red-700 mb-1">❌ AI文案生成失败</label>
+                <p class="text-sm text-red-600" x-text="aiError"></p>
+            </div>
             <div x-show="aiCopy.title" class="mb-6 bg-purple-50 rounded-lg p-4 border border-purple-200">
                 <label class="block text-sm font-medium text-purple-700 mb-2">🤖 AI文案预览</label>
                 <p class="text-sm"><strong>标题：</strong><span x-text="aiCopy.title"></span></p>
@@ -124,7 +128,7 @@ function createCampaign() {
             validity_mode: 'RELATIVE',
             transferable: false, stackable: false, shareable: false, share_limit: 3,
         },
-        aiCopy: {}, aiLoading: false, submitting: false,
+        aiCopy: {}, aiLoading: false, aiError: '', submitting: false,
         init() {},
         async onTypeChange() {
             const r = await fetch('/api/campaigns/defaults/' + this.form.type);
@@ -133,12 +137,18 @@ function createCampaign() {
         },
         async generateCopy() {
             this.aiLoading = true;
+            this.aiCopy = {};
+            this.aiError = '';
             const r = await fetch('/api/ai/generate-copy', {
                 method: 'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({type: this.form.type, params: this.form.params, context: this.form.name})
             });
             const d = await r.json();
-            if (d.success) this.aiCopy = d.data;
+            if (d.success && d.data.source !== 'error') {
+                this.aiCopy = d.data;
+            } else {
+                this.aiError = (d.data && d.data.error) || 'AI调用失败，请检查Bedrock配置';
+            }
             this.aiLoading = false;
         },
         applyCopy() {

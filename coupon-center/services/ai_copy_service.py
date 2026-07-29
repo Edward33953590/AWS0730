@@ -44,20 +44,26 @@ _FALLBACK_TEMPLATES = {
 
 def generate_copy(coupon_type, params, context=''):
     """
-    Generate marketing copy for a campaign.
-    Returns: {title, description, slogan, source}
+    Generate marketing copy for a campaign using AI only.
+    Returns: {title, description, slogan, source} or {error, source}
     """
-    # Try AI generation
-    ai_result = _ai_generate(coupon_type, params, context)
+    # AI generation only - no fallback
+    ai_result, error = _ai_generate(coupon_type, params, context)
     if ai_result:
         return ai_result
 
-    # Fallback to templates
-    return _fallback_generate(coupon_type, params)
+    # Return error info instead of fallback
+    return {
+        'title': '',
+        'description': '',
+        'slogan': '',
+        'source': 'error',
+        'error': error or 'AI调用失败，请检查Bedrock配置',
+    }
 
 
 def _ai_generate(coupon_type, params, context):
-    """Try AI copy generation via Bedrock."""
+    """Try AI copy generation via Bedrock. Returns (result, error)."""
     try:
         from services.bedrock_service import bedrock_service
 
@@ -85,16 +91,17 @@ def _ai_generate(coupon_type, params, context):
 }}"""
 
         result, error = bedrock_service.generate_json(prompt)
-        if error or not result:
-            return None
+        if error:
+            return None, error
 
-        if 'title' in result and 'description' in result:
+        if result and 'title' in result and 'description' in result:
             result['source'] = 'ai'
-            return result
-        return None
+            return result, None
 
-    except Exception:
-        return None
+        return None, 'AI返回格式异常'
+
+    except Exception as e:
+        return None, f'AI服务异常: {str(e)}'
 
 
 def _fallback_generate(coupon_type, params):

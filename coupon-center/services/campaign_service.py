@@ -33,7 +33,7 @@ def validate_campaign_data(data, is_update=False):
         if not data.get('name'):
             errors.append('活动名称不能为空')
         if not data.get('type') or data['type'] not in VALID_TYPES:
-            errors.append(f'无效的优惠券类型，可�? {", ".join(VALID_TYPES)}')
+            errors.append(f'无效的优惠券类型，可 {", ".join(VALID_TYPES)}')
         if not data.get('total_stock') or int(data.get('total_stock', 0)) <= 0:
             errors.append('库存数量必须大于0')
 
@@ -85,7 +85,7 @@ def update_campaign(campaign_id, data):
     """Update an existing campaign."""
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
-        return None, '活动不存�?
+        return None, '活动不存在'
 
     # Update allowed fields
     if 'name' in data:
@@ -120,7 +120,7 @@ def update_campaign(campaign_id, data):
         new_stock = int(data['total_stock'])
         claimed = campaign.total_stock - campaign.remaining_stock
         if new_stock < claimed:
-            return None, f'库存不能低于已发放数�?{claimed})'
+            return None, f'库存不能低于已发放数 {claimed})'
         stock_diff = new_stock - campaign.total_stock
         campaign.total_stock = new_stock
         campaign.remaining_stock += stock_diff
@@ -134,11 +134,11 @@ def delete_campaign(campaign_id):
     """Delete a campaign (only if no coupons issued)."""
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
-        return False, '活动不存�?
+        return False, '活动不存在'
 
     claimed = campaign.total_stock - campaign.remaining_stock
     if claimed > 0:
-        return False, '已有用户领取，无法删�?
+        return False, '已有用户领取，无法删除'
 
     db.session.delete(campaign)
     db.session.commit()
