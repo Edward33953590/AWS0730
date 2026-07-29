@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}数据导出 - 优惠券中心{% endblock %}
+{% block content %}
+<div>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">数据导出</h1>
+    <div class="bg-white rounded-xl shadow-sm border p-6 max-w-lg">
+        <p class="text-gray-600 mb-4">选择导出类型，下载CSV格式数据文件。</p>
+        <div class="space-y-3">
+            <a href="/api/stats/export?type=claims" class="block bg-primary hover:bg-primary-dark text-white px-4 py-3 rounded-lg text-center font-medium transition">
+                导出领券记录 (CSV)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

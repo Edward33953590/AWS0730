@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}优惠券中心{% endblock %}</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    {% if current_user.is_authenticated %}
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="text-xl font-bold text-primary">优惠券中心</a>
+                    {% if current_user.role == 'USER' %}
+                    <a href="/user" class="text-gray-600 hover:text-primary">首页</a>
+                    <a href="/user/explore" class="text-gray-600 hover:text-primary">领券</a>
+                    <a href="/user/coupons" class="text-gray-600 hover:text-primary">我的券包</a>
+                    <a href="/user/ranking" class="text-gray-600 hover:text-primary">排行榜</a>
+                    {% elif current_user.role == 'OPERATOR' %}
+                    <a href="/operator" class="text-gray-600 hover:text-primary">活动管理</a>
+                    <a href="/operator/campaigns/create" class="text-gray-600 hover:text-primary">创建活动</a>
+                    <a href="/operator/templates" class="text-gray-600 hover:text-primary">模板</a>
+                    <a href="/operator/blacklist" class="text-gray-600 hover:text-primary">黑白名单</a>
+                    {% elif current_user.role == 'VERIFIER' %}
+                    <a href="/verifier" class="text-gray-600 hover:text-primary">核销</a>
+                    <a href="/verifier/records" class="text-gray-600 hover:text-primary">记录</a>
+                    {% elif current_user.role == 'ADMIN' %}
+                    <a href="/admin" class="text-gray-600 hover:text-primary">统计面板</a>
+                    <a href="/admin/logs" class="text-gray-600 hover:text-primary">操作日志</a>
+                    <a href="/admin/risk" class="text-gray-600 hover:text-primary">风控</a>
+                    <a href="/admin/export" class="text-gray-600 hover:text-primary">导出</a>
+                    {% endif %}
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div x-data="{ open: false, unread: 0 }" x-init="
+                        fetch('/api/notifications/unread-count')
+                            .then(r => r.json())
+                            .then(d => { if(d.success) unread = d.data.count })
+                    " class="relative">
+                        <button @click="open = !open" class="relative text-gray-600 hover:text-primary">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span x-show="unread > 0" x-text="unread"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"></span>
+                        </button>
+                    </div>
+                    <!-- User Menu -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">{{ current_user.username }}</span>
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                            {% if current_user.role == 'ADMIN' %}管理员
+                            {% elif current_user.role == 'OPERATOR' %}运营
+                            {% elif current_user.role == 'VERIFIER' %}核销
+                            {% else %}用户{% endif %}
+                        </span>
+                        <a href="/logout" class="text-sm text-gray-500 hover:text-red-500">退出</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 mt-4">
+        {% for category, message in messages %}
+        <div class="p-3 rounded-lg mb-2 {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

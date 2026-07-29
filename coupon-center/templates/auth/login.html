@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}登录 - 优惠券中心{% endblock %}
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">优惠券中心</h1>
+        <h2 class="text-lg text-center text-gray-600 mb-6">登录</h2>
+        <div x-data="{ loading: false }" id="login-form">
+            <form @submit.prevent="
+                loading = true;
+                const formData = new FormData($el);
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: formData.get('username'),
+                        password: formData.get('password')
+                    })
+                })
+                .then(r => r.json())
+                .then(d => {
+                    loading = false;
+                    if (d.success) {
+                        window.location.href = d.data.redirect;
+                    } else {
+                        alert(d.error.message);
+                    }
+                })
+                .catch(() => { loading = false; alert('网络错误'); });
+            ">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                    <input type="text" name="username" id="login-username" required minlength="3" maxlength="20"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="请输入用户名">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                    <input type="password" name="password" id="login-password" required minlength="6" maxlength="50"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="请输入密码">
+                </div>
+                <button type="submit" :disabled="loading"
+                    class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg font-medium transition disabled:opacity-50">
+                    <span x-show="!loading">登录</span>
+                    <span x-show="loading">登录中...</span>
+                </button>
+            </form>
+        </div>
+        <p class="text-center text-sm text-gray-500 mt-4">
+            没有账号？<a href="/register" class="text-primary hover:underline">去注册</a>
+        </p>
+
+        <!-- Demo Quick Login -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+            <p class="text-center text-xs text-gray-400 mb-3">演示模式 - 快速登录</p>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="demoLogin('admin','admin123')" class="px-3 py-2 text-xs bg-red-50 hover:bg-red-100 text-red-700 rounded-lg border border-red-200 transition">
+                    管理员
+                </button>
+                <button onclick="demoLogin('operator','operator123')" class="px-3 py-2 text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-lg border border-orange-200 transition">
+                    运营人员
+                </button>
+                <button onclick="demoLogin('verifier','verifier123')" class="px-3 py-2 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200 transition">
+                    核销人员
+                </button>
+                <button onclick="demoLogin('user1','user123')" class="px-3 py-2 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition">
+                    普通用户
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function demoLogin(username, password) {
+    document.getElementById('login-username').value = username;
+    document.getElementById('login-password').value = password;
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) window.location.href = d.data.redirect;
+        else alert(d.error.message);
+    })
+    .catch(() => alert('网络错误'));
+}
+</script>
+{% endblock %}

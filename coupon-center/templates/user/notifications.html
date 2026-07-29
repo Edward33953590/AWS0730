@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}通知 - 优惠券中心{% endblock %}
+{% block content %}
+<div x-data="notifPage()" x-init="init()">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">消息通知</h1>
+        <button @click="markAllRead()" class="text-sm text-primary hover:underline">全部已读</button>
+    </div>
+    <div class="space-y-2">
+        <template x-for="n in notifications" :key="n.id">
+            <div class="bg-white rounded-lg border p-4" :class="n.read ? 'opacity-60' : 'border-l-4 border-l-primary'">
+                <div class="flex justify-between">
+                    <p class="text-gray-800" x-text="n.content"></p>
+                    <span class="text-xs text-gray-400" x-text="n.created_at.substring(0,16)"></span>
+                </div>
+            </div>
+        </template>
+    </div>
+    <div x-show="notifications.length === 0" class="text-center py-12 text-gray-400">暂无通知</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function notifPage() {
+    return {
+        notifications: [],
+        async init() {
+            const r = await fetch('/api/notifications');
+            const d = await r.json();
+            if (d.success) this.notifications = d.data.items || d.data || [];
+        },
+        async markAllRead() {
+            await fetch('/api/notifications/read-all', {method:'PUT'});
+            this.notifications = this.notifications.map(n => ({...n, read: true}));
+        }
+    }
+}
+</script>
+{% endblock %}

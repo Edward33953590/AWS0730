@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}排行榜 - 优惠券中心{% endblock %}
+{% block content %}
+<div x-data="rankPage()" x-init="init()">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">🏆 热门优惠券排行</h1>
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">排名</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">活动</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">类型</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">已领取</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">剩余</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <template x-for="(item, idx) in rankings" :key="item.id">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <span x-text="idx+1" class="font-bold" :class="idx < 3 ? 'text-yellow-500 text-lg' : 'text-gray-500'"></span>
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-800" x-text="item.name"></td>
+                        <td class="px-4 py-3 text-sm text-gray-500" x-text="typeLabel(item.type)"></td>
+                        <td class="px-4 py-3 text-sm" x-text="item.claimed"></td>
+                        <td class="px-4 py-3 text-sm" x-text="item.remaining_stock"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div x-show="rankings.length === 0" class="text-center py-12 text-gray-400">暂无数据</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function rankPage() {
+    return {
+        rankings: [],
+        async init() {
+            const r = await fetch('/api/coupons/ranking');
+            const d = await r.json();
+            if (d.success) this.rankings = d.data;
+        },
+        typeLabel(t) {
+            const m = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
+            return m[t]||t;
+        }
+    }
+}
+</script>
+{% endblock %}

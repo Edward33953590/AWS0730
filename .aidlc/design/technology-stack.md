@@ -1,108 +1,156 @@
-# 技术栈文档
+# 技术栈文档（修订版 - Python）
+
+> 变更原因：Node.js环境安装失败，用户选择切换到Python技术栈
 
 ## 1. 核心技术栈
 
 | 类别 | 技术 | 版本 | 选择理由 |
 |------|------|------|----------|
-| 框架 | Next.js | 14.x | App Router全栈框架，SSR+API一体 |
-| 前端库 | React | 18.x | Next.js内置，生态成熟 |
-| 语言 | TypeScript | 5.x | 类型安全，开发体验好 |
-| 样式 | TailwindCSS | 3.x | 原子化CSS，快速开发，无需写CSS文件 |
-| 数据库 | SQLite | 3.x | 零配置，单文件，单机部署完美 |
-| ORM | Prisma | 5.x | 类型安全，迁移管理，开发体验好 |
-| 认证 | jose | 5.x | JWT签发/验证，轻量无依赖 |
-| 密码 | bcryptjs | 2.x | 密码哈希，纯JS实现无需编译 |
-| AI | @aws-sdk/client-bedrock-runtime | latest | Bedrock SDK调用 |
-| AI | @aws-sdk/client-bedrock | latest | 模型列表获取 |
+| 语言 | Python | 3.11 | 用户环境已有 |
+| Web框架 | Flask | 3.x | 轻量全栈，Jinja2模板渲染 |
+| 模板引擎 | Jinja2 | 3.x | Flask内置 |
+| 样式 | TailwindCSS | CDN | 无需Node构建 |
+| 前端交互 | Alpine.js | CDN | 超轻量响应式JS框架 |
+| 图表 | Chart.js | CDN | 轻量图表库 |
+| 数据库 | SQLite | 3.x | Python内置支持 |
+| ORM | SQLAlchemy + Flask-SQLAlchemy | 2.x | Python最流行ORM |
+| 数据库迁移 | Flask-Migrate (Alembic) | 4.x | Schema版本管理 |
+| 认证 | Flask-Login + JWT (PyJWT) | | 会话管理+API认证 |
+| 密码 | Werkzeug (pbkdf2) | | Flask内置密码哈希 |
+| AI | boto3 (Bedrock Runtime) | | AWS SDK for Python |
+| 数据导出 | openpyxl | | Excel导出 |
+| 表单 | Flask-WTF | | 表单校验+CSRF |
 
-## 2. 前端辅助库
+## 2. 完整依赖列表 (requirements.txt)
 
-| 类别 | 技术 | 选择理由 |
-|------|------|----------|
-| 图表 | Recharts | React原生图表，API简单 |
-| 图标 | lucide-react | 现代图标库，体积小 |
-| 表单 | react-hook-form | 轻量表单管理 |
-| 数据导出 | xlsx | Excel导出（sheetjs） |
-| HTTP客户端 | fetch (内置) | 无需额外库 |
-| 日期 | date-fns | 轻量日期处理 |
-| Toast通知 | react-hot-toast | 简单好用的Toast |
-
-## 3. 开发工具
-
-| 类别 | 技术 | 用途 |
-|------|------|------|
-| 包管理 | npm | Node.js默认包管理 |
-| 代码规范 | ESLint | Next.js内置配置 |
-| 格式化 | Prettier | 代码格式统一 |
-| 数据库管理 | Prisma Studio | 可视化数据库浏览 |
-
-## 4. 项目配置
-
-### package.json 关键依赖
-
-```json
-{
-  "dependencies": {
-    "next": "^14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "@prisma/client": "^5.15.0",
-    "@aws-sdk/client-bedrock": "^3.600.0",
-    "@aws-sdk/client-bedrock-runtime": "^3.600.0",
-    "jose": "^5.6.0",
-    "bcryptjs": "^2.4.3",
-    "recharts": "^2.12.0",
-    "lucide-react": "^0.400.0",
-    "react-hook-form": "^7.52.0",
-    "react-hot-toast": "^2.4.0",
-    "date-fns": "^3.6.0",
-    "xlsx": "^0.18.5"
-  },
-  "devDependencies": {
-    "typescript": "^5.5.0",
-    "prisma": "^5.15.0",
-    "@types/react": "^18.3.0",
-    "@types/node": "^20.14.0",
-    "@types/bcryptjs": "^2.4.6",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0"
-  }
-}
+```
+flask>=3.0.0
+flask-sqlalchemy>=3.1.0
+flask-migrate>=4.0.0
+flask-login>=0.6.0
+flask-wtf>=1.2.0
+pyjwt>=2.8.0
+boto3>=1.34.0
+openpyxl>=3.1.0
+python-dotenv>=1.0.0
 ```
 
-### 启动命令
+## 3. 前端CDN依赖（无需安装）
+
+```html
+<!-- TailwindCSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Alpine.js (轻量响应式交互) -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<!-- Chart.js (图表) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+```
+
+## 4. 项目结构
+
+```
+coupon-center/
+├── app.py                  # Flask应用入口
+├── config.py               # 配置文件
+├── requirements.txt        # Python依赖
+├── .env.example            # 环境变量模板
+├── .env                    # 本地环境变量（不提交）
+├── models/                 # 数据模型
+│   ├── __init__.py
+│   ├── user.py
+│   ├── campaign.py
+│   ├── coupon.py
+│   ├── redemption.py
+│   ├── notification.py
+│   ├── risk_log.py
+│   ├── operation_log.py
+│   ├── share_link.py
+│   ├── blacklist.py
+│   ├── template.py
+│   └── favorite.py
+├── services/               # 业务逻辑层
+│   ├── __init__.py
+│   ├── auth_service.py
+│   ├── campaign_service.py
+│   ├── coupon_service.py
+│   ├── redemption_service.py
+│   ├── bedrock_service.py
+│   ├── risk_engine.py
+│   ├── stats_service.py
+│   ├── notification_service.py
+│   └── log_service.py
+├── routes/                 # 路由/视图
+│   ├── __init__.py
+│   ├── auth.py
+│   ├── user.py
+│   ├── operator.py
+│   ├── verifier.py
+│   ├── admin.py
+│   └── api.py             # JSON API接口
+├── templates/              # Jinja2 HTML模板
+│   ├── base.html           # 基础布局
+│   ├── auth/
+│   │   ├── login.html
+│   │   └── register.html
+│   ├── user/
+│   │   ├── index.html
+│   │   ├── explore.html
+│   │   ├── coupons.html
+│   │   ├── favorites.html
+│   │   ├── ranking.html
+│   │   └── notifications.html
+│   ├── operator/
+│   │   ├── index.html
+│   │   ├── campaigns.html
+│   │   ├── create.html
+│   │   ├── edit.html
+│   │   ├── templates.html
+│   │   ├── batch.html
+│   │   └── blacklist.html
+│   ├── verifier/
+│   │   ├── index.html
+│   │   └── records.html
+│   ├── admin/
+│   │   ├── dashboard.html
+│   │   ├── logs.html
+│   │   ├── export.html
+│   │   ├── risk.html
+│   │   └── profiles.html
+│   └── share.html
+├── static/                 # 静态资源
+│   └── js/
+│       └── app.js          # 通用JS工具函数
+├── migrations/             # 数据库迁移（Flask-Migrate生成）
+└── seed.py                 # 种子数据脚本
+```
+
+## 5. 启动命令
 
 ```bash
-npm install          # 安装依赖
-npx prisma generate  # 生成Prisma Client
-npx prisma db push   # 创建数据库表
-npx prisma db seed   # 填充种子数据
-npm run dev          # 启动开发服务器 (localhost:3000)
+# 安装依赖
+pip install -r requirements.txt
+
+# 初始化数据库
+flask db upgrade
+python seed.py
+
+# 启动开发服务器
+python app.py
+# 或
+flask run --debug --port 5000
 ```
 
-## 5. 约束与替代方案
+## 6. 约束与替代方案
 
 | 约束 | 当前选择 | 替代方案 | 不选择的原因 |
 |------|----------|----------|-------------|
-| 单机部署 | SQLite | PostgreSQL | 需要额外安装数据库服务 |
-| 快速开发 | Next.js全栈 | 前后端分离(React+Express) | 多项目维护复杂 |
-| 认证 | 自研JWT | NextAuth.js | NextAuth配置复杂，不需要OAuth |
-| 状态管理 | Context+fetch | Redux/Zustand | 项目不复杂，无需全局状态管理 |
-| 图表 | Recharts | ECharts/D3 | ECharts体积大，D3学习成本高 |
-| CSS | TailwindCSS | CSS Modules/Styled | Tailwind开发最快 |
-
-## 6. SQLite WAL模式配置
-
-SQLite默认为顺序写入，启用WAL模式提升并发性能：
-
-```typescript
-// prisma/schema.prisma 中无需额外配置
-// 在应用启动时执行:
-// PRAGMA journal_mode = WAL;
-// PRAGMA busy_timeout = 5000;
-```
-
-这样可以支持并发读取，写入时通过busy_timeout等待而非立即失败。
+| 无Node环境 | Flask+Jinja2 | Django | Django过重，Flask更灵活 |
+| 前端样式 | TailwindCSS CDN | Bootstrap | Tailwind更现代，CDN同样方便 |
+| 前端交互 | Alpine.js CDN | jQuery/原生JS | Alpine.js声明式语法，与HTML集成好 |
+| 图表 | Chart.js CDN | ECharts | Chart.js更轻量 |
+| ORM | SQLAlchemy | Peewee | SQLAlchemy生态最大 |

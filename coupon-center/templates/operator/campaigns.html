@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}活动管理 - 优惠券中心{% endblock %}
+{% block content %}
+<div x-data="campaignList()" x-init="init()">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">活动管理</h1>
+        <a href="/operator/campaigns/create" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm">
+            + 创建活动
+        </a>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">活动名称</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">类型</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">库存</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">状态</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <template x-for="c in campaigns" :key="c.id">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium text-gray-800" x-text="c.name"></td>
+                        <td class="px-4 py-3 text-sm" x-text="typeLabel(c.type)"></td>
+                        <td class="px-4 py-3 text-sm" x-text="c.remaining_stock + '/' + c.total_stock"></td>
+                        <td class="px-4 py-3">
+                            <span class="text-xs px-2 py-0.5 rounded" :class="c.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'" x-text="c.is_active ? '进行中' : '已结束'"></span>
+                        </td>
+                        <td class="px-4 py-3 space-x-2">
+                            <a :href="'/operator/campaigns/' + c.id" class="text-sm text-primary hover:underline">编辑</a>
+                            <button @click="deleteCampaign(c.id)" class="text-sm text-red-500 hover:underline">删除</button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function campaignList() {
+    return {
+        campaigns: [],
+        async init() {
+            const r = await fetch('/api/campaigns');
+            const d = await r.json();
+            if (d.success) this.campaigns = d.data.items;
+        },
+        async deleteCampaign(id) {
+            if (!confirm('确定删除？')) return;
+            const r = await fetch('/api/campaigns/' + id, {method:'DELETE'});
+            const d = await r.json();
+            if (d.success) { this.init(); } else { alert(d.error.message); }
+        },
+        typeLabel(t) {
+            const m = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
+            return m[t]||t;
+        }
+    }
+}
+</script>
+{% endblock %}

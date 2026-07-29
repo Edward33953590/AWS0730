@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}首页 - 优惠券中心{% endblock %}
+{% block content %}
+<div x-data="userHome()" x-init="init()">
+    <!-- AI Recommendations -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-800">
+                <i data-lucide="sparkles" class="w-5 h-5 inline text-yellow-500"></i>
+                为你推荐
+            </h2>
+            <button @click="loadRecommendations()" class="text-sm text-primary hover:underline">
+                <i data-lucide="refresh-cw" class="w-4 h-4 inline"></i> 刷新推荐
+            </button>
+        </div>
+        <div x-show="recLoading" class="flex justify-center py-8">
+            <div class="animate-pulse text-gray-400">AI 正在分析您的偏好...</div>
+        </div>
+        <div x-show="!recLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <template x-for="rec in recommendations" :key="rec.campaign_id">
+                <div class="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded" x-text="typeLabel(rec.campaign_type)"></span>
+                        <span class="text-xs text-gray-400" x-text="'剩余' + rec.remaining_stock + '张'"></span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-1" x-text="rec.campaign_name"></h3>
+                    <p class="text-sm text-green-600 mb-3" x-text="'💡 ' + rec.reason"></p>
+                    <button @click="claimCoupon(rec.campaign_id)" class="w-full bg-primary hover:bg-primary-dark text-white py-1.5 rounded text-sm transition">
+                        立即领取
+                    </button>
+                </div>
+            </template>
+        </div>
+        <div x-show="!recLoading && recommendations.length === 0" class="text-center py-8 text-gray-400">
+            暂无推荐，试试浏览所有优惠券
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <a href="/user/explore" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
+            <i data-lucide="ticket" class="w-8 h-8 mx-auto text-primary mb-2"></i>
+            <span class="text-sm text-gray-700">浏览领券</span>
+        </a>
+        <a href="/user/coupons" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
+            <i data-lucide="wallet" class="w-8 h-8 mx-auto text-green-500 mb-2"></i>
+            <span class="text-sm text-gray-700">我的券包</span>
+        </a>
+        <a href="/user/favorites" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
+            <i data-lucide="heart" class="w-8 h-8 mx-auto text-red-400 mb-2"></i>
+            <span class="text-sm text-gray-700">收藏夹</span>
+        </a>
+        <a href="/user/ranking" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
+            <i data-lucide="trophy" class="w-8 h-8 mx-auto text-yellow-500 mb-2"></i>
+            <span class="text-sm text-gray-700">排行榜</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function userHome() {
+    return {
+        recommendations: [],
+        recLoading: false,
+        init() {
+            this.loadRecommendations();
+        },
+        async loadRecommendations() {
+            this.recLoading = true;
+            try {
+                const r = await fetch('/api/ai/recommend', {method: 'POST'});
+                const d = await r.json();
+                if (d.success) this.recommendations = d.data.recommendations;
+            } catch(e) {}
+            this.recLoading = false;
+        },
+        async claimCoupon(campaignId) {
+            const r = await fetch('/api/coupons/claim', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({campaign_id: campaignId})
+            });
+            const d = await r.json();
+            if (d.success) {
+                alert('领取成功！券码: ' + d.data.coupon_code);
+                this.loadRecommendations();
+            } else {
+                alert(d.error.message);
+            }
+        },
+        typeLabel(type) {
+            const map = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
+            return map[type] || type;
+        }
+    }
+}
+</script>
+{% endblock %}

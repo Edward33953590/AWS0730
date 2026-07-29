@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}分享领券 - 优惠券中心{% endblock %}
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-md p-8 max-w-md w-full text-center" x-data="shareClaim()">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">🎁 好友分享的优惠券</h1>
+        <p class="text-gray-500 mb-6">点击下方按钮领取优惠券</p>
+        {% if current_user.is_authenticated %}
+        <button @click="claim()" :disabled="claimed"
+            class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-bold text-lg transition disabled:opacity-50">
+            <span x-show="!claimed">立即领取</span>
+            <span x-show="claimed" x-text="resultMsg"></span>
+        </button>
+        {% else %}
+        <p class="text-gray-600 mb-4">请先登录后再领取</p>
+        <a href="/login" class="inline-block bg-primary text-white px-6 py-2 rounded-lg">去登录</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function shareClaim() {
+    return {
+        claimed: false, resultMsg: '',
+        async claim() {
+            const r = await fetch('/api/coupons/claim-share/{{ share_code }}', {method:'POST'});
+            const d = await r.json();
+            this.claimed = true;
+            if (d.success) {
+                this.resultMsg = '领取成功! 券码: ' + d.data.coupon_code;
+            } else {
+                this.resultMsg = d.error.message;
+            }
+        }
+    }
+}
+</script>
+{% endblock %}
