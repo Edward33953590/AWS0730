@@ -121,3 +121,78 @@
 - 券码规则说明
 - 完整API接口清单（40+接口）
 - 章节重新编号（共17节）
+
+
+---
+
+## 2026-07-29 AIDLC第1段：需求分析完成
+
+### 执行内容
+1. 第0段：创建 .aidlc 目录结构（plan/requirements/design + src）
+2. 第1A段：分析需求，提出3个补充问题（Q-009~Q-011）
+3. 第1B段：生成4份正式需求文档
+
+### 补充问答
+- Q-009 优惠券使用方式：用户出示券码→核销人员输入核销
+- Q-010 AI推荐触发：自动加载+手动刷新
+- Q-011 有效期计算：两种模式都支持，运营选择
+
+### 产出文件
+- `.aidlc/plan/req-plan.md` - 需求分析计划（含全部问答记录）
+- `.aidlc/requirements/functional-requirements.md` - 功能需求（24条）
+- `.aidlc/requirements/non-functional-requirements.md` - 非功能需求（10条）
+- `.aidlc/requirements/user-stories.md` - 用户故事（22条）
+- `.aidlc/requirements/requirements-checklist.md` - 需求清单+门禁检查
+
+### 门禁结论
+满足进入设计阶段条件，下一步：第2段系统设计。
+
+
+---
+
+## 2026-07-29 AIDLC第2段：系统设计完成
+
+### 执行内容
+无需向用户提问（技术栈已锁定），直接完成全部6份设计文档。
+
+### 技术决策 (ADR)
+- ADR-001: Next.js App Router（Server Components优势）
+- ADR-002: SQLite + Prisma（单机部署+类型安全）
+- ADR-003: 事务+条件UPDATE实现库存原子扣减
+- ADR-004: jose库自研JWT认证
+- ADR-005: 参考bedrock.service.ts封装AI服务层
+- ADR-006: Recharts作为图表库
+
+### 产出文件
+- `.aidlc/plan/design-plan.md` - 设计计划+ADR
+- `.aidlc/design/system-architecture.md` - 系统架构（分层、模块、安全边界、降级）
+- `.aidlc/design/database-design.md` - 数据库设计（11张表、枚举、索引、约束）
+- `.aidlc/design/api-specification.md` - API接口规范（40+接口详细定义）
+- `.aidlc/design/frontend-design.md` - 前端设计（路由、组件、交互、视觉）
+- `.aidlc/design/technology-stack.md` - 技术栈文档（依赖+配置+替代方案）
+- `.aidlc/design/traceability-matrix.md` - 追踪矩阵（需求→设计全链路映射）
+
+### 门禁结论
+满足进入任务规划阶段条件，下一步：第3段实现任务规划。
+
+
+---
+
+## 2026-07-29 AIDLC第3段：实现任务规划完成
+
+### 任务清单概要（25个任务）
+
+**基础层（T-001~T-003）**：项目初始化、数据库、认证系统
+**核心业务（T-004~T-007）**：活动管理、领券、核销、日志
+**AI能力（T-008~T-010）**：风控引擎、智能推券、文案生成
+**前端核心（T-011~T-015）**：布局认证、用户端、运营端、核销端、统计面板
+**增强功能（T-016~T-023）**：通知、转赠分享、收藏排行、模板批量、黑白名单、风控页面、画像、叠加
+**收尾（T-024~T-025）**：UI美化、端到端演示验证
+
+### 主依赖链
+T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009/T-010
+T-003 → T-011 → T-012/T-013/T-014/T-015
+全部 → T-024 → T-025
+
+### 下一步
+等待用户审阅任务列表。认可后进入第4段逐任务实现。

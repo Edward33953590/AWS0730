@@ -23,7 +23,41 @@
 - [x] 确认部署方式：本地运行
 - [x] 确认扩展功能：16项
 - [x] 生成 setup.md 项目说明文档
-- [ ] 生成正式需求文档（functional/non-functional/user-stories/checklist）
+- [x] 生成正式需求文档（functional/non-functional/user-stories/checklist）
+
+## 补充问答记录
+
+### Q-009
+[Question]
+优惠券"使用"场景如何体现？
+
+[Answer]
+A - 用户出示券码给核销人员，核销人员输入券码完成核销（使用=核销）
+
+### Q-010
+[Question]
+AI智能推券的触发时机？
+
+[Answer]
+C - 进入页面自动加载 + 可点刷新推荐
+
+### Q-011
+[Question]
+优惠券有效期的计算方式？
+
+[Answer]
+C - 两种模式都支持（领取后N天 / 固定日期范围），运营创建时选择
+
+## 阶段完成状态
+
+- **状态**：已完成
+- **完成日期**：2026-07-29
+- **产出文件**：
+  - .aidlc/requirements/functional-requirements.md（24条FR）
+  - .aidlc/requirements/non-functional-requirements.md（10条NFR）
+  - .aidlc/requirements/user-stories.md（22条US）
+  - .aidlc/requirements/requirements-checklist.md（覆盖矩阵+门禁检查）
+- **门禁结论**：满足进入设计阶段条件
 
 ## 问答记录
 
