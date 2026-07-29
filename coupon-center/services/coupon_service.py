@@ -37,18 +37,18 @@ def claim_coupon(user_id, campaign_id):
     """
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
-        return None, 'CAMPAIGN_NOT_FOUND', '活动不存�?
+        return None, 'CAMPAIGN_NOT_FOUND', '活动不存在'
 
     # Check if campaign has started
     if campaign.start_time and datetime.utcnow() < campaign.start_time:
-        return None, 'CAMPAIGN_NOT_STARTED', '活动未开�?
+        return None, 'CAMPAIGN_NOT_STARTED', '活动未开始'
 
     # Check if campaign is a NEWCOMER type - only first-time users
     if campaign.type == 'NEWCOMER':
         # Check if user has any coupons already (not a newcomer)
         existing_coupons = Coupon.query.filter_by(user_id=user_id).count()
         if existing_coupons > 0:
-            return None, 'NOT_NEWCOMER', '仅限新用户领�?
+            return None, 'NOT_NEWCOMER', '仅限新用户领取'
 
     # Check user limit
     user_claimed = Coupon.query.filter_by(
@@ -56,13 +56,13 @@ def claim_coupon(user_id, campaign_id):
     ).filter(Coupon.status != 'TRANSFERRED').count()
 
     if user_claimed >= campaign.limit_per_user:
-        return None, 'ALREADY_CLAIMED', '已达到领取上�?
+        return None, 'ALREADY_CLAIMED', '已达到领取上限'
 
     # Risk check
     from services.risk_engine import check_risk
     risk_result = check_risk(user_id, action='CLAIM', campaign_id=campaign_id)
     if risk_result['decision'] == 'BLOCK':
-        return None, 'RISK_BLOCKED', f"操作异常，已被拦�? {risk_result['reason']}"
+        return None, 'RISK_BLOCKED', f"操作异常，已被拦截: {risk_result['reason']}"
 
     # Atomic stock decrement using raw SQL for concurrency safety
     result = db.session.execute(
