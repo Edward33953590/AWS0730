@@ -113,7 +113,9 @@
             result: {},
             errorMsg: '',
             errorCode: '',
+            _autoRedeemed: false, // 防 Alpine x-init 重复执行
             init(precheckError) {
+                if (this._autoRedeemed) return; // 防重入
                 console.log('[扫码核销] 页面初始化, coupon_code={{ coupon_code }}');
                 this.$nextTick(() => {
                     if (window.lucide) lucide.createIcons();
@@ -127,6 +129,8 @@
                 this.autoRedeem();
             },
             async autoRedeem() {
+                if (this._autoRedeemed) return; // 防重入
+                this._autoRedeemed = true;
                 const couponCode = '{{ coupon_code }}';
                 console.log('[扫码核销] 开始自动核销:', couponCode);
                 try {
@@ -146,9 +150,13 @@
                             redeemed_at: data.data?.redeemed_at || new Date().toLocaleString()
                         };
                         if (data.data?.status === 'ALREADY_REDEEMED') {
+                            // 如果已经是成功状态，不要被"已核销"覆盖
+                            if (this.status === 'success') return;
                             this.status = 'already_redeemed';
                         } else {
                             this.status = 'success';
+                            // 核销成功，3秒后自动跳转到核销首页
+                            setTimeout(() => { window.location.href = '/verifier'; }, 3000);
                         }
                         // 振动反馈
                         try { navigator.vibrate(200); } catch(e) {}

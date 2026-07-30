@@ -81,8 +81,6 @@
                 :class="result?.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'"
                 x-text="result?.msg">
             </div>
-
-            <!-- 登录成功后自动跳转到核销页，此处不再展示核销详情 -->
         </div>
     </div>
 
@@ -113,7 +111,6 @@
                 this.loading = true;
                 this.result = null;
                 try {
-                    // Step 1: Login — 先登录拿到 session cookie
                     const loginRes = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -130,27 +127,9 @@
                         return;
                     }
 
-                    // 登录成功 → 在本页直接核销（不跳转，避免 cookie 时序问题）
-                    // 此时 session cookie 已写入当前页面，fetch 自动携带
-                    this.result = { type: 'info', msg: '登录成功，正在核销...' };
-                    const redeemRes = await fetch('/api/redeem', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ coupon_code: this.couponCode })
-                    });
-                    const redeemData = await redeemRes.json();
-                    console.log('[扫码登录] 核销结果:', JSON.stringify(redeemData));
-
-                    if (redeemData.success) {
-                        this.result = { type: 'success', msg: '核销成功！正在跳转...' };
-                        // 核销成功，跳转到核销首页（此时 cookie 已在浏览器中稳定存在）
-                        setTimeout(() => { window.location.href = '/verifier'; }, 1500);
-                    } else {
-                        const msg = redeemData.error?.message || '核销失败，请重试';
-                        const code = redeemData.error?.code || '';
-                        this.result = { type: 'error', msg: '核销失败：' + msg + (code ? ' [' + code + ']' : '') };
-                        this.loading = false;
-                    }
+                    // 登录成功 → 跳转到扫码落地页完整展示核销结果
+                    this.result = { type: 'success', msg: '登录成功，正在跳转...' };
+                    window.location.href = '/v/' + this.couponCode;
                 } catch(e) {
                     console.error('[扫码登录] 异常:', e);
                     this.result = { type: 'error', msg: '网络错误，请检查连接后重试' };
