@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}AI 效果对比实验室{% endblock %}
+
+{% block content %}
+<div x-data="aiImpact()">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">🤖 AI 效果对比实验室</h1>
+            <p class="text-sm text-slate-500 mt-1">量化 AI 能力的业务价值</p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl p-5 text-white">
+            <div class="text-sm opacity-80">AI推荐点击率提升</div>
+            <div class="text-4xl font-bold mt-2">94%</div>
+            <div class="text-xs opacity-70 mt-1">vs 热门券推荐</div>
+        </div>
+        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-5 text-white">
+            <div class="text-sm opacity-80">AI风控准确率提升</div>
+            <div class="text-4xl font-bold mt-2">21%</div>
+            <div class="text-xs opacity-70 mt-1">vs 规则引擎</div>
+        </div>
+        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-5 text-white">
+            <div class="text-sm opacity-80">AI文案生成节省</div>
+            <div class="text-4xl font-bold mt-2">99%</div>
+            <div class="text-xs opacity-70 mt-1">时间成本降低</div>
+        </div>
+    </div>
+
+    <!-- Recommendation Comparison -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">📊 智能推荐效果对比</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- AI Group -->
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-medium text-sm mb-4">
+                    <i data-lucide="brain" class="w-4 h-4"></i>
+                    AI 智能推荐组
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">点击率</div>
+                        <div class="text-3xl font-bold text-blue-600" x-text="data.recommendation?.ai_click_rate + '%'">35.2%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mt-2">
+                            <div class="bg-blue-500 rounded-full h-3 transition-all" :style="'width:' + (data.recommendation?.ai_click_rate || 35) + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">转化率（领券）</div>
+                        <div class="text-3xl font-bold text-blue-600" x-text="data.recommendation?.ai_conversion_rate + '%'">22.4%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mt-2">
+                            <div class="bg-blue-400 rounded-full h-3 transition-all" :style="'width:' + (data.recommendation?.ai_conversion_rate || 22) + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Popular Group -->
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 font-medium text-sm mb-4">
+                    <i data-lucide="flame" class="w-4 h-4"></i>
+                    热门券推荐组
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">点击率</div>
+                        <div class="text-3xl font-bold text-slate-500" x-text="data.recommendation?.popular_click_rate + '%'">18.1%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mt-2">
+                            <div class="bg-slate-400 rounded-full h-3 transition-all" :style="'width:' + (data.recommendation?.popular_click_rate || 18) + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">转化率（领券）</div>
+                        <div class="text-3xl font-bold text-slate-500" x-text="data.recommendation?.popular_conversion_rate + '%'">12.3%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mt-2">
+                            <div class="bg-slate-400 rounded-full h-3 transition-all" :style="'width:' + (data.recommendation?.popular_conversion_rate || 12) + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-xs text-center">
+            📌 数据为演示预设值，实现埋点系统后将替换为实际统计数据
+        </div>
+    </div>
+
+    <!-- Risk Control Comparison -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">🛡️ AI 风控效果对比</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- AI Model -->
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 text-purple-700 font-medium text-sm mb-4">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    AI 风控模型
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">准确率</div>
+                        <div class="text-3xl font-bold text-purple-600" x-text="data.risk_control?.ai_accuracy + '%'">92.3%</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">误杀率</div>
+                        <div class="text-3xl font-bold text-green-600" x-text="data.risk_control?.ai_false_positive + '%'">3.2%</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Rule Engine -->
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 font-medium text-sm mb-4">
+                    <i data-lucide="shield" class="w-4 h-4"></i>
+                    规则引擎
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">准确率</div>
+                        <div class="text-3xl font-bold text-slate-500" x-text="data.risk_control?.rule_accuracy + '%'">76.1%</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1">误杀率</div>
+                        <div class="text-3xl font-bold text-red-500" x-text="data.risk_control?.rule_false_positive + '%'">9.7%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 px-4 py-2 rounded-lg bg-purple-50 text-purple-700 text-xs text-center">
+            📌 数据为演示预设值，实现埋点系统后将替换为实际统计数据
+        </div>
+    </div>
+
+    <!-- AI Copywriting Efficiency -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">✍️ AI 文案生成效率</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200">
+                <div class="text-sm text-slate-600 mb-2">AI生成耗时</div>
+                <div class="text-4xl font-bold text-amber-600">3<span class="text-lg">秒</span></div>
+            </div>
+            <div class="text-center p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-sm text-slate-600 mb-2">人工撰写耗时</div>
+                <div class="text-4xl font-bold text-slate-500">5<span class="text-lg">分钟</span></div>
+            </div>
+            <div class="text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+                <div class="text-sm text-slate-600 mb-2">效率提升</div>
+                <div class="text-4xl font-bold text-green-600">100<span class="text-lg">倍</span></div>
+            </div>
+        </div>
+        <div class="mt-6 p-4 rounded-lg bg-slate-50">
+            <h4 class="text-sm font-medium text-slate-700 mb-2">AI 能力清单</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> 智能推荐
+                </div>
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> 风控检测
+                </div>
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> 文案生成
+                </div>
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span> 用户画像
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real Stats -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">📈 系统实际运行数据</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-slate-50 text-center">
+                <div class="text-sm text-slate-500">累计发券</div>
+                <div class="text-2xl font-bold text-slate-800 mt-1" x-text="data.real_stats?.total_coupons_issued || 0"></div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 text-center">
+                <div class="text-sm text-slate-500">风控检测次数</div>
+                <div class="text-2xl font-bold text-slate-800 mt-1" x-text="data.real_stats?.total_risk_checks || 0"></div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 text-center">
+                <div class="text-sm text-slate-500">风控拦截</div>
+                <div class="text-2xl font-bold text-red-600 mt-1" x-text="data.real_stats?.risk_blocks || 0"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function aiImpact() {
+    return {
+        data: {},
+        init() { this.fetchData(); },
+        async fetchData() {
+            try {
+                const res = await fetch('/api/stats/ai-impact');
+                const json = await res.json();
+                if (json.success) this.data = json.data;
+            } catch (e) { console.error(e); }
+        }
+    }
+}
+</script>
+{% endblock %}

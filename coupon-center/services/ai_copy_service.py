@@ -44,22 +44,16 @@ _FALLBACK_TEMPLATES = {
 
 def generate_copy(coupon_type, params, context=''):
     """
-    Generate marketing copy for a campaign using AI only.
-    Returns: {title, description, slogan, source} or {error, source}
+    Generate marketing copy for a campaign using AI with fallback.
+    Returns: {title, description, slogan, source}
     """
-    # AI generation only - no fallback
+    # Try AI generation first
     ai_result, error = _ai_generate(coupon_type, params, context)
     if ai_result:
         return ai_result
 
-    # Return error info instead of fallback
-    return {
-        'title': '',
-        'description': '',
-        'slogan': '',
-        'source': 'error',
-        'error': error or 'AI调用失败，请检查Bedrock配置',
-    }
+    # AI failed - fallback to template-based generation
+    return _fallback_generate(coupon_type, params)
 
 
 def _ai_generate(coupon_type, params, context):

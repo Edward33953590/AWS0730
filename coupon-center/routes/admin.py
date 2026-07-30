@@ -12,6 +12,27 @@ def index():
     return render_template('admin/dashboard.html')
 
 
+@admin_bp.route('/dashboard/live')
+@role_required('ADMIN')
+def live_dashboard():
+    """Real-time data visualization dashboard."""
+    return render_template('admin/live_dashboard.html')
+
+
+@admin_bp.route('/ai-impact')
+@role_required('ADMIN')
+def ai_impact():
+    """AI effect comparison lab."""
+    return render_template('admin/ai_impact.html')
+
+
+@admin_bp.route('/team')
+@role_required('ADMIN')
+def team():
+    """Team contribution wall."""
+    return render_template('admin/team_wall.html')
+
+
 @admin_bp.route('/logs')
 @role_required('ADMIN')
 def logs():

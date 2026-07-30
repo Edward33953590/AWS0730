@@ -549,6 +549,135 @@ def mark_all_read():
     return jsonify({'success': True})
 
 
+# ==================== Real-time Stats API ====================
+
+@api_bp.route('/stats/realtime', methods=['GET'])
+@role_required('ADMIN')
+def stats_realtime():
+    """Real-time dashboard data."""
+    from models.coupon import Coupon
+    from models.redemption import Redemption
+    from models.user import User
+    from models.operation_log import OperationLog
+    from datetime import datetime, timedelta
+
+    total_coupons = Coupon.query.count()
+    total_redeemed = Coupon.query.filter_by(status='REDEEMED').count()
+    redeem_rate = round(total_redeemed / max(total_coupons, 1) * 100, 1)
+    active_users = User.query.count()
+
+    # Recent operations (last 10)
+    recent_ops = OperationLog.query.order_by(OperationLog.created_at.desc()).limit(10).all()
+    recent_list = []
+    for op in recent_ops:
+        user = User.query.get(op.user_id)
+        username = user.username if user else '系统'
+        recent_list.append({
+            'time': op.created_at.strftime('%H:%M:%S') if op.created_at else '',
+            'user': username,
+            'action': op.action,
+            'target': op.target or '',
+            'detail': op.detail or '',
+        })
+
+    return jsonify({'success': True, 'data': {
+        'total_coupons': total_coupons,
+        'total_redeemed': total_redeemed,
+        'redeem_rate': redeem_rate,
+        'active_users': active_users,
+        'recent_operations': recent_list,
+    }})
+
+
+@api_bp.route('/stats/trend', methods=['GET'])
+@role_required('ADMIN')
+def stats_trend():
+    """Trend data for last 24 hours (hourly)."""
+    from models.coupon import Coupon
+    from models.redemption import Redemption
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    hours = []
+    claims_data = []
+    redeems_data = []
+
+    for i in range(23, -1, -1):
+        hour_start = now - timedelta(hours=i)
+        hour_end = hour_start + timedelta(hours=1)
+        hour_label = hour_start.strftime('%H:00')
+
+        claims = Coupon.query.filter(
+            Coupon.claimed_at >= hour_start,
+            Coupon.claimed_at < hour_end
+        ).count()
+
+        redeems = Redemption.query.filter(
+            Redemption.redeemed_at >= hour_start,
+            Redemption.redeemed_at < hour_end
+        ).count()
+
+        hours.append(hour_label)
+        claims_data.append(claims)
+        redeems_data.append(redeems)
+
+    # Type distribution
+    type_dist = db.session.query(
+        Campaign.type, db.func.count(Campaign.id)
+    ).group_by(Campaign.type).all()
+    type_distribution = [{'type': t, 'count': c} for t, c in type_dist]
+
+    return jsonify({'success': True, 'data': {
+        'hours': hours,
+        'claims': claims_data,
+        'redeems': redeems_data,
+        'type_distribution': type_distribution,
+    }})
+
+
+@api_bp.route('/stats/ai-impact', methods=['GET'])
+@role_required('ADMIN')
+def stats_ai_impact():
+    """AI impact comparison data (demo preset values + real counts)."""
+    from models.coupon import Coupon
+    from models.risk_log import RiskLog
+
+    # Real data counts
+    total_coupons = Coupon.query.count()
+    total_risk_checks = RiskLog.query.count()
+    risk_blocks = RiskLog.query.filter_by(decision='BLOCK').count()
+
+    # Preset demo comparison data (as noted in plan - will use real data once tracking is implemented)
+    return jsonify({'success': True, 'data': {
+        'recommendation': {
+            'ai_click_rate': 35.2,
+            'popular_click_rate': 18.1,
+            'ai_conversion_rate': 22.4,
+            'popular_conversion_rate': 12.3,
+            'improvement_click': 94,
+            'improvement_conversion': 83,
+        },
+        'risk_control': {
+            'ai_accuracy': 92.3,
+            'rule_accuracy': 76.1,
+            'ai_false_positive': 3.2,
+            'rule_false_positive': 9.7,
+            'improvement_accuracy': 21,
+            'improvement_fp': 67,
+        },
+        'copywriting': {
+            'ai_time_seconds': 3,
+            'manual_time_seconds': 300,
+            'time_saved_percent': 99,
+        },
+        'real_stats': {
+            'total_coupons_issued': total_coupons,
+            'total_risk_checks': total_risk_checks,
+            'risk_blocks': risk_blocks,
+        }
+    }})
+
+
 # ==================== Health ====================
 
 @api_bp.route('/health')

@@ -33,30 +33,31 @@
 
 | 需求 | 设计对应 | 验证方式 |
 |------|----------|----------|
-| NFR-001 并发安全 | Campaign.remainingStock原子扣减（事务+条件WHERE） | 并发压测N+1请求 |
-| NFR-002 幂等性 | Redemption.couponId UNIQUE + 状态检查 | 重复核销测试 |
+| NFR-001 并发安全 | Campaign.remaining_stock原子扣减（事务+条件WHERE） | 并发压测N+1请求 |
+| NFR-002 幂等性 | Redemption.coupon_id UNIQUE + 状态检查 | 重复核销测试 |
 | NFR-003 响应时间 | AI接口超时设置(10s/15s) + 规则引擎<100ms | 接口计时 |
 | NFR-004 AI降级 | BedrockService try-catch + fallback逻辑 | 模拟AI不可用 |
-| NFR-005 安全性 | bcrypt + JWT + 角色中间件 + Prisma参数化 | 越权/注入测试 |
-| NFR-006 数据一致性 | Prisma事务 + 状态机约束 | 数据核对 |
-| NFR-007 可用性 | SQLite无外部依赖 + npm run dev一键启动 | 新环境启动 |
-| NFR-008 可维护性 | TypeScript严格类型 + 模块化文件结构 | 代码审查 |
+| NFR-005 安全性 | bcrypt + JWT + 角色装饰器 + SQLAlchemy参数化 | 越权/注入测试 |
+| NFR-006 数据一致性 | SQLAlchemy事务 + 状态机约束 | 数据核对 |
+| NFR-007 可用性 | SQLite无外部依赖 + python app.py一键启动 | 新环境启动 |
+| NFR-008 可维护性 | 分层架构(routes/services/models) + 模块化文件结构 | 代码审查 |
 | NFR-009 演示友好 | 美观UI + 操作流畅 + AI输出可见 | 模拟演示 |
-| NFR-010 环境配置 | .env.example + Prisma自动迁移 + seed | 新环境搭建 |
+| NFR-010 环境配置 | .env.example + SQLAlchemy自动建表 + seed.py | 新环境搭建 |
 
 ## 服务层模块清单
 
 | 模块 | 文件路径 | 职责 |
 |------|----------|------|
-| AuthService | lib/services/auth.ts | 注册、登录、JWT签发验证 |
-| CampaignService | lib/services/campaign.ts | 活动CRUD、参数校验 |
-| CouponService | lib/services/coupon.ts | 领券、转赠、库存扣减 |
-| RedemptionService | lib/services/redemption.ts | 核销、幂等、过期检查 |
-| BedrockService | lib/services/bedrock.ts | AI调用封装（参考已有代码） |
-| RiskEngine | lib/services/risk-engine.ts | 风控AI+规则引擎 |
-| ShareService | lib/services/share.ts | 分享链接生成、领取 |
-| StatsService | lib/services/stats.ts | 统计聚合、导出 |
-| LogService | lib/services/log.ts | 操作日志记录 |
-| NotificationService | lib/services/notification.ts | 通知创建、查询 |
-| BlacklistService | lib/services/blacklist.ts | 黑白名单管理 |
-| TemplateService | lib/services/template.ts | 活动模板CRUD |
+| AuthService | services/auth_service.py | 注册、登录、JWT签发验证、角色装饰器 |
+| CampaignService | services/campaign_service.py | 活动CRUD、参数校验、类型默认值 |
+| CouponService | services/coupon_service.py | 领券、转赠、库存原子扣减 |
+| RedemptionService | services/redemption_service.py | 核销、幂等、过期检查 |
+| BedrockService | services/bedrock_service.py | AI调用封装（SDK/Bearer Token双模式） |
+| RiskEngine | services/risk_engine.py | 风控AI+规则引擎（6条规则） |
+| AiCopyService | services/ai_copy_service.py | AI文案生成+模板降级 |
+| AiRecommendService | services/ai_recommend_service.py | AI智能推荐+热门券降级 |
+| AiProfileService | services/ai_profile_service.py | AI用户画像+规则降级 |
+| ShareService | services/share_service.py | 分享链接生成、领取 |
+| StatsService | services/stats_service.py | 统计聚合、导出 |
+| LogService | services/log_service.py | 操作日志记录 |
+| NotificationService | services/notification_service.py | 通知创建、查询 |

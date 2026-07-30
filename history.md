@@ -389,3 +389,50 @@ T-003 → T-011 → T-012/T-013/T-014/T-015
 - 线上核销提交仅发送通知，不直接执行核销，核销操作仍由核销人员确认完成
 - 核销人员界面顶部展示未处理的线上核销请求列表，可一键核销或忽略
 - 新增 `GET /api/redeem/online-requests` 接口供核销人员获取待处理请求
+
+
+---
+
+## 2026-07-30 P0竞赛增强任务完成
+
+### 变更内容
+
+#### Task-005: 修复 AI 文案降级 Bug ✅
+- 修改 `services/ai_copy_service.py`：AI失败时调用 `_fallback_generate()` 返回模板文案
+- `source` 字段设为 `'fallback'`，7种券类型均有对应模板
+- 受影响文件：`coupon-center/services/ai_copy_service.py`
+
+#### Task-001: 实时数据可视化大屏 ✅
+- 新增 API：`GET /api/stats/realtime`（核心指标 + 最近10条操作动态）
+- 新增 API：`GET /api/stats/trend`（24小时趋势数据，小时级粒度）
+- 新增页面：`/admin/dashboard/live`（深色主题大屏，Chart.js折线图+饼图，3秒自动刷新）
+- 受影响文件：`routes/api.py`、`routes/admin.py`、`templates/admin/live_dashboard.html`、`templates/base.html`
+
+#### Task-002: AI 效果对比实验室 ✅
+- 新增 API：`GET /api/stats/ai-impact`（预设演示数据 + 真实统计计数）
+- 新增页面：`/admin/ai-impact`（推荐对比、风控对比、文案效率、系统实际数据）
+- 受影响文件：`routes/api.py`、`routes/admin.py`、`templates/admin/ai_impact.html`、`templates/base.html`
+
+#### Task-003: 团队贡献墙 ✅
+- 新增页面：`/admin/team`（成员卡片、AIDLC进度条、代码贡献统计、协作工具链）
+- 受影响文件：`routes/admin.py`、`templates/admin/team_wall.html`、`templates/base.html`
+
+#### Task-004: AIDLC 反思总结文档 ✅
+- 新增文件：`AIDLC_RETROSPECTIVE.md`
+- 包含：7个章节（时间线、收获、挑战、如果重来、下一步、协作模式、方法论）
+- 受影响文件：项目根目录 `AIDLC_RETROSPECTIVE.md`
+
+#### Task-006: 同步追踪矩阵文档路径 ✅
+- 更新 `.aidlc/design/traceability-matrix.md`
+- 所有服务层路径从 TypeScript (`lib/services/*.ts`) 更新为 Python (`services/*_service.py`)
+- 非功能需求设计对应从 Prisma/npm 更新为 SQLAlchemy/Flask
+- 受影响文件：`.aidlc/design/traceability-matrix.md`
+
+#### 侧边栏导航更新
+- 管理员导航新增3个链接：实时大屏、AI效果对比、团队贡献墙
+- 受影响文件：`templates/base.html`
+
+### 技术决策
+- 实时大屏使用深色渐变主题（`from-slate-900 via-purple-900`），适合投影演示
+- AI效果对比使用预设演示数据（标注说明），后续可接入真实埋点
+- 团队贡献墙使用硬编码占位成员（成员A-E），团队确认后替换真实信息
