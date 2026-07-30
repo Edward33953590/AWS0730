@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠券中心 · 项目总结</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body { font-family:'Inter','Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; background:#0a0a0f; color:#e2e8f0; }
+        .slide { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:4rem 2rem; position:relative; }
+        .slide-inner { max-width:1000px; margin:0 auto; width:100%; }
+        .slide-nav { position:fixed; right:1.2rem; top:50%; transform:translateY(-50%); z-index:100; display:flex; flex-direction:column; gap:0.6rem; }
+        .slide-nav a { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.2); transition:all .3s; }
+        .slide-nav a:hover, .slide-nav a.active { background:#60a5fa; transform:scale(1.3); box-shadow:0 0 12px rgba(96,165,250,0.4); }
+        .progress-bar { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,#3b82f6,#8b5cf6); z-index:200; transition:width .4s; }
+        .glow-text { background:linear-gradient(135deg,#f8fafc,#93c5fd,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .anim-up { animation:fadeUp .8s ease-out both; }
+        .anim-float { animation:float 3s ease-in-out infinite; }
+        .dot-pattern { background-image:radial-gradient(rgba(255,255,255,0.05) 1px,transparent 1px); background-size:24px 24px; }
+        .card { background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:1.2rem; transition:all .3s; }
+        .card:hover { border-color:rgba(96,165,250,0.2); }
+        .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:999px; font-size:.7rem; font-weight:600; }
+        .badge-blue { background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.15); }
+        .badge-purple { background:rgba(139,92,246,0.12); color:#c4b5fd; border:1px solid rgba(139,92,246,0.15); }
+        .badge-amber { background:rgba(245,158,11,0.12); color:#fcd34d; border:1px solid rgba(245,158,11,0.15); }
+        .badge-emerald { background:rgba(16,185,129,0.12); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
+        .badge-red { background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.15); }
+        @media (max-width:768px) { .slide { padding:2rem 1.2rem; } .slide-nav{display:none} }
+        .code-inline { font-family:'Fira Code','Consolas',monospace; background:rgba(255,255,255,0.06); padding:1px 6px; border-radius:4px; font-size:.7rem; color:#93c5fd; }
+        .timeline-dot { position:relative; padding-left:2rem; border-left:1px solid rgba(255,255,255,0.08); }
+        .timeline-dot::before { content:''; position:absolute; left:-3px; top:0; width:6px; height:6px; border-radius:50%; background:#60a5fa; box-shadow:0 0 12px rgba(96,165,250,0.4); }
+        .code-block { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:0.6rem; padding:0.8rem 1rem; font-family:'Fira Code','Consolas',monospace; font-size:.7rem; line-height:1.7; color:#cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <nav class="slide-nav" id="slideNav">
+        <a href="#s1" data-slide="1" class="active"></a>
+        <a href="#s2" data-slide="2"></a>
+        <a href="#s3" data-slide="3"></a>
+        <a href="#s4" data-slide="4"></a>
+        <a href="#s5" data-slide="5"></a>
+        <a href="#s6" data-slide="6"></a>
+    </nav>
+
+    <!-- SLIDE 1: COVER -->
+    <section id="s1" class="slide dot-pattern" style="background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);">
+        <div class="slide-inner text-center">
+            <div class="anim-up">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold shadow-2xl anim-float" style="box-shadow:0 0 50px rgba(59,130,246,0.25);">券</div>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-3 anim-up" style="animation-delay:0.1s">
+                <span class="glow-text">优惠券发放与核销中心</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 font-light mb-6 anim-up" style="animation-delay:0.2s">AIDLC 实战 · 22 小时从零到交付</p>
+            <div class="flex flex-wrap justify-center gap-2 mb-8 anim-up" style="animation-delay:0.3s">
+                <span class="badge badge-blue">Flask 3.x</span>
+                <span class="badge badge-blue">SQLAlchemy</span>
+                <span class="badge badge-purple">DeepSeek AI</span>
+                <span class="badge badge-amber">PWA</span>
+            </div>
+            <div class="flex justify-center gap-10 anim-up" style="animation-delay:0.35s">
+                <div><div class="text-3xl font-bold text-white">4</div><div class="text-xs text-slate-500">角色权限</div></div>
+                <div><div class="text-3xl font-bold text-white">7</div><div class="text-xs text-slate-500">优惠券类型</div></div>
+                <div><div class="text-3xl font-bold text-white">22h</div><div class="text-xs text-slate-500">开发周期</div></div>
+            </div>
+            <div class="mt-10 text-slate-600 anim-up" style="animation-delay:0.4s"><i data-lucide="chevron-down" class="w-5 h-5 mx-auto anim-float"></i></div>
+        </div>
+    </section>
+
+    <!-- SLIDE 2: WHAT WE ACTUALLY BUILT -->
+    <section id="s2" class="slide" style="background:#0f172a;">
+        <div class="slide-inner">
+            <div class="text-center mb-8 anim-up">
+                <span class="badge badge-blue text-xs mb-3">项目概览</span>
+                <h2 class="text-3xl md:text-5xl font-black glow-text">4 个角色 · 7 种券 · 30+ API</h2>
+                <p class="text-slate-400 mt-3">ADMIN 管全局 · OPERATOR 管活动 · VERIFIER 管核销 · USER 领券用券</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 anim-up">
+                <div class="card p-5">
+                    <h3 class="font-bold text-white text-sm mb-3">7 种优惠券类型</h3>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <span class="text-slate-300"><span class="text-blue-400">●</span> 满减券 — 消费满 X 减 Y</span>
+                        <span class="text-slate-300"><span class="text-purple-400">●</span> 折扣券 — 百分比打折</span>
+                        <span class="text-slate-300"><span class="text-emerald-400">●</span> 无门槛券 — 直接抵扣</span>
+                        <span class="text-slate-300"><span class="text-amber-400">●</span> 加赠券 — 买 A 送 B</span>
+                        <span class="text-slate-300"><span class="text-red-400">●</span> 品类券 — 指定品类折扣</span>
+                        <span class="text-slate-300"><span class="text-cyan-400">●</span> 新人券 — 首单专属</span>
+                        <span class="text-slate-300"><span class="text-pink-400">●</span> 限时券 — 闪购窗口</span>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <h3 class="font-bold text-white text-sm mb-3">技术实现亮点</h3>
+                    <ul class="text-xs text-slate-400 space-y-2">
+                        <li>• 原子库存扣减 — <span class="code-inline">UPDATE campaigns SET remaining_stock = remaining_stock - 1 WHERE remaining_stock &gt; 0</span></li>
+                        <li>• 并发兜底 — try/except IntegrityError + rollback + 重查</li>
+                        <li>• AI 四服务 — 推荐 / 风控 / 文案 / 画像，全部 try/fallback</li>
+                        <li>• PWA 支持 — manifest.json + sw.js，手机可添加主屏幕</li>
+                        <li>• 响应式布局 + 振动反馈 + Web Share API</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-4 card p-4 text-center text-xs text-slate-500 anim-up">
+                14 个服务模块 · 11 个数据模型 · 7 个 Flask 蓝图 · 16 项自动化测试
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3: THE REAL JOURNEY -->
+    <section id="s3" class="slide" style="background:linear-gradient(180deg,#0f172a,#111827);">
+        <div class="slide-inner">
+            <div class="text-center mb-8 anim-up">
+                <span class="badge badge-amber text-xs mb-3">开发实录</span>
+                <h2 class="text-3xl md:text-5xl font-black glow-text">这 22 小时实际发生了什么</h2>
+                <p class="text-slate-400 mt-3">AIDLC 四个阶段，每个阶段都有真实的故事</p>
+            </div>
+            <div class="space-y-4 anim-up">
+                <!-- Phase 1 -->
+                <div class="timeline-dot">
+                    <div class="card p-5 ml-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="badge badge-blue">Phase 1 需求</span>
+                            <span class="text-xs text-slate-500">30 分钟</span>
+                        </div>
+                        <p class="text-sm text-slate-300">AI 生成 24 条需求，人确认了 6 处关键调整，确定了 4 角色 + 7 券型的范围。这时候看起来很顺利。</p>
+                    </div>
+                </div>
+                <!-- Phase 2 -->
+                <div class="timeline-dot">
+                    <div class="card p-5 ml-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="badge badge-purple">Phase 2 设计</span>
+                            <span class="text-xs text-slate-500">30 分钟 → 出问题了</span>
+                        </div>
+                        <p class="text-sm text-slate-300">AI 选了 Next.js + Prisma + TypeScript，ADR 都写好了。进到 Phase 3 第一步 <span class="code-inline">npm install</span> 一直超时。Node.js 环境不可用。</p>
+                        <p class="text-sm text-slate-400 mt-1">人的决定：<strong class="text-white">30 分钟内全栈迁移到 Flask</strong>。设计文档作废，但项目活下来了。AI 不会主动说"换个方案吧"——这个决策只能人来做。</p>
+                    </div>
+                </div>
+                <!-- Phase 3 -->
+                <div class="timeline-dot">
+                    <div class="card p-5 ml-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="badge badge-amber">Phase 3 实现</span>
+                            <span class="text-xs text-slate-500">AI 写的代码，人修的 3 个坑</span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm text-slate-300"><strong class="text-white">AI 生成服务层、路由、模板</strong>，速度很快。但代码审核发现了三个问题：</p>
+                            <div class="pl-3 text-xs space-y-2">
+                                <div class="text-slate-400"><span class="text-amber-400">① 循环依赖</span> — AI 把 <span class="code-inline">db</span> 定义在 <span class="code-inline">app.py</span>，models 从 app 导入。运行时报错。人把 db 抽到了独立的 <span class="code-inline">extensions.py</span>。</div>
+                                <div class="text-slate-400"><span class="text-red-400">② 降级断路径</span> — AI 文案服务定义了 <span class="code-inline">_fallback_generate()</span> 但从未被调用。表面看"降级已实现"，实际调用路径没连上。</div>
+                                <div class="text-slate-400"><span class="text-purple-400">③ 竞态条件</span> — 双请求同时核销同一券码，ORM 检查都通过。线上查日志才发现。人加了 <span class="code-inline">try/except IntegrityError</span> 兜底。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Phase 4 -->
+                <div class="timeline-dot">
+                    <div class="card p-5 ml-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="badge badge-emerald">Phase 4 验证</span>
+                            <span class="text-xs text-slate-500">16 项测试 + 10 步手动验证</span>
+                        </div>
+                        <p class="text-sm text-slate-300">自动化测试覆盖全部 API，端到端手动验证覆盖 7 个移动端场景。手机扫码→自动核销→振动反馈，全程 2 秒。</p>
+                        <p class="text-xs text-slate-500 mt-1">测试环境：Windows 11 + Chrome + 手机 WiFi 局域网</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: REAL AI INTERACTION -->
+    <section id="s4" class="slide" style="background:#0f172a;">
+        <div class="slide-inner">
+            <div class="text-center mb-8 anim-up">
+                <span class="badge badge-purple text-xs mb-3">人机协作实录</span>
+                <h2 class="text-3xl md:text-5xl font-black glow-text">AI 做了什么，人做了什么</h2>
+                <p class="text-slate-400 mt-3">把 AI 辅助开发的真实分工摊开来看</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 anim-up">
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i>AI 有效的地方</h3>
+                    <div class="space-y-2 text-xs text-slate-300">
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>生成需求文档 + ADR 设计</span><span class="badge badge-emerald text-[10px]">30 分钟</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>14 个服务模块代码生成</span><span class="badge badge-emerald text-[10px]">快速</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>7 个蓝图路由 + 模板</span><span class="badge badge-emerald text-[10px]">快速</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>原子库存 SQL 实现</span><span class="badge badge-emerald text-[10px]">高效</span></div>
+                        <div class="flex justify-between"><span>AI 推荐/风控/文案/画像服务</span><span class="badge badge-emerald text-[10px]">可用</span></div>
+                    </div>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i>人必须介入的地方</h3>
+                    <div class="space-y-2 text-xs text-slate-300">
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>技术栈迁移决策</span><span class="badge badge-amber text-[10px]">仅人能判断</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>循环依赖架构重构</span><span class="badge badge-amber text-[10px]">需要理解框架</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>降级路径代码审计</span><span class="badge badge-red text-[10px]">AI 盲区</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1.5"><span>并发竞态条件修复</span><span class="badge badge-amber text-[10px]">经验判断</span></div>
+                        <div class="flex justify-between"><span>端到端场景验证</span><span class="badge badge-amber text-[10px]">不能省略</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 card p-4 text-center anim-up">
+                <p class="text-sm text-slate-300">
+                    AI 写代码效率高，但 <strong class="text-white">AI 生成的代码"能运行"不代表"正确"</strong>。降级没有调用路径、循环依赖只在运行时暴露——这些只有人能发现。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 5: REFLECTIONS FROM REAL CODE -->
+    <section id="s5" class="slide" style="background:linear-gradient(180deg,#0f172a,#111827);">
+        <div class="slide-inner">
+            <div class="text-center mb-8 anim-up">
+                <span class="badge badge-red text-xs mb-3">从代码中得出的反思</span>
+                <h2 class="text-3xl md:text-5xl font-black glow-text">三个真实问题，三个改变</h2>
+                <p class="text-slate-400 mt-3">不是理论推演，是从实际报错和日志里发现的</p>
+            </div>
+            <div class="space-y-4 anim-up">
+                <div class="card p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-red-400 font-bold">问题 1</span>
+                        <span class="text-white font-bold text-sm">设计假设在实现时被推翻</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Next.js 方案在文档里看起来很完美，但 <span class="code-inline">npm install</span> 一直超时。设计阶段没有验证"环境是否可用"这个前提。</p>
+                    <div class="mt-1.5 text-xs text-emerald-400">→ 下次补充"环境验证"步骤再进入设计</div>
+                </div>
+                <div class="card p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-amber-400 font-bold">问题 2</span>
+                        <span class="text-white font-bold text-sm">任务按"层"分，而不是按"功能"分</span>
+                    </div>
+                    <p class="text-xs text-slate-400">先做完全部后端 API（30+ 端点），再做前端页面。导致演示时后端完整但多个页面是占位符。</p>
+                    <div class="mt-1.5 text-xs text-emerald-400">→ 按"功能"垂直切片：活动管理（前后端）→ 领券 → 核销</div>
+                </div>
+                <div class="card p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-purple-400 font-bold">问题 3</span>
+                        <span class="text-white font-bold text-sm">AI 降级路径没有强制验证</span>
+                    </div>
+                    <p class="text-xs text-slate-400">文案服务定义了 <span class="code-inline">_fallback_generate()</span> 但入口 never 走到那里。人以为"有降级"，实际上是断的。验收时如果只测"AI 正常"这条路，永远发现不了。</p>
+                    <div class="mt-1.5 text-xs text-emerald-400">→ 验收清单增加必查项：AI 异常时是否触发降级 + 降级输出是否可读</div>
+                </div>
+            </div>
+            <div class="mt-4 card p-4 text-center anim-up">
+                <p class="text-sm text-slate-300">
+                    这三个问题有一个共同点：<strong class="text-white">表面看起来一切正常，但代码执行路径是断的</strong>。AI 擅长让表面完美，人需要穿透表面。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 6: CLOSING -->
+    <section id="s6" class="slide dot-pattern" style="background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);">
+        <div class="slide-inner text-center">
+            <div class="anim-up">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-2xl anim-float" style="box-shadow:0 0 50px rgba(16,185,129,0.25);">
+                    <i data-lucide="check-circle" class="w-8 h-8"></i>
+                </div>
+            </div>
+            <h2 class="text-4xl md:text-6xl font-black mb-2 anim-up glow-text" style="animation-delay:0.1s">交付完成</h2>
+            <p class="text-slate-400 mb-8 anim-up text-sm" style="animation-delay:0.2s">AI 加速了执行，但判断力来自人</p>
+            <div class="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8 anim-up" style="animation-delay:0.25s">
+                <div class="card p-3"><div class="text-lg font-bold text-white">22h</div><div class="text-[10px] text-slate-500">开发周期</div></div>
+                <div class="card p-3"><div class="text-lg font-bold text-white">2</div><div class="text-[10px] text-slate-500">核心反思</div></div>
+                <div class="card p-3"><div class="text-lg font-bold text-white">16</div><div class="text-[10px] text-slate-500">测试通过</div></div>
+            </div>
+            <div class="text-xs text-slate-600 anim-up" style="animation-delay:0.3s">
+                SRCG Workshop · 2026
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const bar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const p = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            bar.style.width = (p * 100) + '%';
+            let cur = 0;
+            document.querySelectorAll('.slide').forEach((s,i) => {
+                if(s.getBoundingClientRect().top <= window.innerHeight/2) cur = i+1;
+            });
+            document.querySelectorAll('.slide-nav a').forEach(a => a.classList.toggle('active', parseInt(a.dataset.slide) === cur));
+        });
+        setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 200);
+    </script>
+</body>
+</html>
