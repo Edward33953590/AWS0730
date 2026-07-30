@@ -14,13 +14,13 @@ def transfer_coupon(coupon_id, from_user_id, target_username):
     """Transfer a coupon to another user. Returns (result, error)."""
     coupon = Coupon.query.filter_by(id=coupon_id, user_id=from_user_id).first()
     if not coupon:
-        return None, '优惠券不存在或不属于�?
+        return None, '优惠券不存在或不属于你'
 
     if coupon.status != 'CLAIMED':
-        return None, '该券状态不可转�?
+        return None, '该券状态不可转赠'
 
     if coupon.is_expired:
-        return None, '该券已过�?
+        return None, '该券已过期'
 
     campaign = Campaign.query.get(coupon.campaign_id)
     if not campaign or not campaign.transferable:
@@ -28,10 +28,10 @@ def transfer_coupon(coupon_id, from_user_id, target_username):
 
     target_user = User.query.filter_by(username=target_username).first()
     if not target_user:
-        return None, '目标用户不存�?
+        return None, '目标用户不存在'
 
     if target_user.id == from_user_id:
-        return None, '不能转赠给自�?
+        return None, '不能转赠给自己'
 
     # Perform transfer
     coupon.status = 'TRANSFERRED'
@@ -69,7 +69,7 @@ def create_share_link(campaign_id, user_id):
     """Create a share link for a campaign. Returns (share_link, error)."""
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
-        return None, '活动不存�?
+        return None, '活动不存在'
     if not campaign.shareable:
         return None, '该活动不支持分享'
 
@@ -93,13 +93,13 @@ def claim_by_share(share_code, user_id):
     """Claim a coupon via share link. Returns (coupon, error_code, error_msg)."""
     link = ShareLink.query.filter_by(share_code=share_code).first()
     if not link:
-        return None, 'INVALID_LINK', '无效的分享链�?
+        return None, 'INVALID_LINK', '无效的分享链接'
 
     if link.expires_at and datetime.utcnow() > link.expires_at:
-        return None, 'LINK_EXPIRED', '链接已过�?
+        return None, 'LINK_EXPIRED', '链接已过期'
 
     if link.current_claims >= link.max_claims:
-        return None, 'LINK_EXHAUSTED', '分享次数已用�?
+        return None, 'LINK_EXHAUSTED', '分享次数已用完'
 
     # Use normal claim logic
     from services.coupon_service import claim_coupon

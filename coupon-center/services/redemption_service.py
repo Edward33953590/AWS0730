@@ -34,11 +34,11 @@ def redeem_coupon(coupon_code, verifier_id):
 
     # Check if transferred
     if coupon.status == 'TRANSFERRED':
-        return None, 'COUPON_TRANSFERRED', '该券已转�?, 400
+        return None, 'COUPON_TRANSFERRED', '该券已转赠', 400
 
     # Check status is CLAIMED
     if coupon.status != 'CLAIMED':
-        return None, 'INVALID_STATUS', f'券状态异�? {coupon.status}', 400
+        return None, 'INVALID_STATUS', f'券状态异常: {coupon.status}', 400
 
     # Perform redemption
     now = datetime.utcnow()
