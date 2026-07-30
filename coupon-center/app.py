@@ -46,6 +46,7 @@ def create_app(config_class=Config):
         from models import user, campaign, coupon, redemption
         from models import notification, risk_log, operation_log
         from models import share_link, blacklist, template, favorite
+        from models import poster_asset
         db.create_all()
 
     return app

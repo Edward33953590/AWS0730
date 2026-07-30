@@ -26,13 +26,6 @@ def ai_impact():
     return render_template('admin/ai_impact.html')
 
 
-@admin_bp.route('/team')
-@role_required('ADMIN')
-def team():
-    """Team contribution wall."""
-    return render_template('admin/team_wall.html')
-
-
 @admin_bp.route('/logs')
 @role_required('ADMIN')
 def logs():

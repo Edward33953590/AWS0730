@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "description": "海报背景图资源配置 - 运营人员创建活动时可选用这些背景图生成优惠券海报",
+  "assets": [
+    {
+      "id": "bg_zen_bamboo",
+      "name": "清雅竹韵",
+      "description": "水墨竹叶与青瓷茶杯，淡雅中式风格，适合茶饮/养生/文化类优惠券",
+      "filename": "bg_zen_bamboo.jpg",
+      "category": "中式典雅",
+      "style": "zen",
+      "text_area": {
+        "x": 120,
+        "y": 200,
+        "width": 400,
+        "height": 150
+      },
+      "text_color": "#2d3748",
+      "recommended_font_size": 28
+    },
+    {
+      "id": "bg_luxury_gold",
+      "name": "黑金奢华",
+      "description": "黑色丝绸背景搭配金色花纹边框，尊贵奢华感，适合高端/VIP/会员类优惠券",
+      "filename": "bg_luxury_gold.jpg",
+      "category": "高端奢华",
+      "style": "luxury",
+      "text_area": {
+        "x": 180,
+        "y": 280,
+        "width": 440,
+        "height": 200
+      },
+      "text_color": "#d4af37",
+      "recommended_font_size": 32
+    },
+    {
+      "id": "bg_vintage_tea",
+      "name": "复古茶邮",
+      "description": "复古邮票拼贴风格，茶具与茶叶点缀，适合茶品/咖啡/饮品类优惠券",
+      "filename": "bg_vintage_tea.jpg",
+      "category": "复古文艺",
+      "style": "vintage",
+      "text_area": {
+        "x": 200,
+        "y": 180,
+        "width": 380,
+        "height": 220
+      },
+      "text_color": "#4a3728",
+      "recommended_font_size": 26
+    },
+    {
+      "id": "bg_festive_red",
+      "name": "喜庆中国红",
+      "description": "红色底配金色山水纹饰与扇形留白区域，浓厚节庆氛围，适合节日/促销/新年类优惠券",
+      "filename": "bg_festive_red.jpg",
+      "category": "节庆喜气",
+      "style": "festive",
+      "text_area": {
+        "x": 160,
+        "y": 300,
+        "width": 480,
+        "height": 180
+      },
+      "text_color": "#fef3c7",
+      "recommended_font_size": 30
+    }
+  ]
+}

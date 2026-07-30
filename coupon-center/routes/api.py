@@ -688,6 +688,145 @@ def stats_ai_impact():
     }})
 
 
+# ==================== Poster API ====================
+
+@api_bp.route('/poster/assets', methods=['GET'])
+@role_required('OPERATOR')
+def get_poster_assets():
+    """Get available poster background assets."""
+    from services.poster_service import get_poster_assets as svc_get_assets
+    category = request.args.get('category', None)
+    style = request.args.get('style', None)
+    assets = svc_get_assets(category=category, style=style)
+    return jsonify({'success': True, 'data': {'items': assets}})
+
+
+@api_bp.route('/poster/generate', methods=['POST'])
+@role_required('OPERATOR')
+def generate_poster():
+    """Generate a coupon poster with custom text on a background image."""
+    from services.poster_service import generate_poster as svc_generate
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '请求数据无效'}}), 400
+
+    asset_id = data.get('asset_id')
+    title = data.get('title', '').strip()
+    description = data.get('description', '').strip()
+    slogan = data.get('slogan', '').strip()
+    campaign_name = data.get('campaign_name', '').strip()
+
+    if not asset_id:
+        return jsonify({'success': False, 'error': {'code': 'INVALID_INPUT', 'message': '请选择背景图'}}), 400
+    if not title:
+        return jsonify({'success': False, 'error': {'code': 'INVALID_INPUT', 'message': '请输入标题文案'}}), 400
+
+    result, error = svc_generate(
+        asset_id=asset_id,
+        title=title,
+        description=description,
+        slogan=slogan,
+        campaign_name=campaign_name,
+    )
+    if error:
+        return jsonify({'success': False, 'error': {'code': 'GENERATE_FAILED', 'message': error}}), 400
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/poster/generate-with-ai', methods=['POST'])
+@role_required('OPERATOR')
+def generate_poster_with_ai():
+    """Generate a poster with AI-generated marketing copy."""
+    from services.poster_service import generate_poster_with_ai_copy
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '请求数据无效'}}), 400
+
+    asset_id = data.get('asset_id')
+    coupon_type = data.get('coupon_type', 'FULL_REDUCTION')
+    params = data.get('params', {})
+    context = data.get('context', '')
+    campaign_name = data.get('campaign_name', '')
+
+    if not asset_id:
+        return jsonify({'success': False, 'error': {'code': 'INVALID_INPUT', 'message': '请选择背景图'}}), 400
+
+    result, error = generate_poster_with_ai_copy(
+        asset_id=asset_id,
+        coupon_type=coupon_type,
+        params=params,
+        context=context,
+        campaign_name=campaign_name,
+    )
+    if error:
+        return jsonify({'success': False, 'error': {'code': 'GENERATE_FAILED', 'message': error}}), 400
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/poster/upload-asset', methods=['POST'])
+@role_required('OPERATOR')
+def upload_poster_asset():
+    """Upload a new poster background image."""
+    import uuid as uuid_mod
+    import json as json_mod
+    from models.poster_asset import PosterAsset
+    from werkzeug.utils import secure_filename
+
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '请上传图片文件'}}), 400
+
+    file = request.files['file']
+    if not file.filename:
+        return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '文件名为空'}}), 400
+
+    # Validate file type
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'webp'}
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+    if ext not in allowed_extensions:
+        return jsonify({'success': False, 'error': {'code': 'INVALID_FILE', 'message': '仅支持 PNG/JPG/WEBP 格式'}}), 400
+
+    # Save file
+    import os
+    assets_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'poster_assets')
+    filename = f'custom_{uuid_mod.uuid4().hex[:8]}.{ext}'
+    filepath = os.path.join(assets_dir, filename)
+    file.save(filepath)
+
+    # Get form data
+    name = request.form.get('name', '自定义背景图')
+    description = request.form.get('description', '')
+    category = request.form.get('category', '自定义')
+    style = request.form.get('style', 'custom')
+    text_color = request.form.get('text_color', '#ffffff')
+    font_size = int(request.form.get('font_size', '28'))
+
+    # Default text area (center of image)
+    text_area = {
+        'x': int(request.form.get('text_x', '100')),
+        'y': int(request.form.get('text_y', '200')),
+        'width': int(request.form.get('text_width', '400')),
+        'height': int(request.form.get('text_height', '200')),
+    }
+
+    # Create database record
+    asset = PosterAsset(
+        id=str(uuid_mod.uuid4()),
+        name=name,
+        description=description,
+        filename=filename,
+        category=category,
+        style=style,
+        text_area_json=json_mod.dumps(text_area),
+        text_color=text_color,
+        recommended_font_size=font_size,
+        uploaded_by=current_user.id,
+    )
+    db.session.add(asset)
+    db.session.commit()
+
+    return jsonify({'success': True, 'data': asset.to_dict()}), 201
+
+
 # ==================== Health ====================
 
 @api_bp.route('/health')

@@ -464,3 +464,18 @@ T-003 → T-011 → T-012/T-013/T-014/T-015
 - `services/ai_profile_service.py`
 - `services/ai_recommend_service.py`
 - `services/risk_engine.py`
+
+
+---
+
+## 2026-07-30 删除团队贡献墙功能
+
+### 变更内容
+- 从管理员侧边栏导航中移除"团队贡献墙"链接
+- 从 `routes/admin.py` 中移除 `/admin/team` 路由
+- 删除模板文件 `templates/admin/team_wall.html`
+
+### 受影响的文件
+- `coupon-center/templates/base.html` — 移除侧边栏导航链接
+- `coupon-center/routes/admin.py` — 移除 team() 路由函数
+- `coupon-center/templates/admin/team_wall.html` — 已删除
