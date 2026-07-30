@@ -75,7 +75,7 @@ function userHome() {
         async claimCoupon(campaignId) {
             const r = await fetch('/api/coupons/claim', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({campaign_id:campaignId}) });
             const d = await r.json();
-            if (d.success) { alert('领取成功！券码: ' + d.data.coupon_code); this.loadRecommendations(); } else { alert(d.error.message); }
+            if (d.success) { $modal.success('领取成功！', '券码: ' + d.data.coupon_code); this.loadRecommendations(); } else { $modal.error(d.error.message); }
         },
         typeLabel(type) { return {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'}[type]||type; }
     }

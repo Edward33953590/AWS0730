@@ -133,7 +133,7 @@ function createCampaign() {
             this.submitting=true;
             const r=await fetch('/api/campaigns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.form)});
             const d=await r.json(); this.submitting=false;
-            if(d.success) { alert('创建成功！'); window.location.href='/operator/campaigns'; } else { alert(d.error.message); }
+            if(d.success) { $modal.success('创建成功！').then(() => window.location.href='/operator/campaigns'); } else { $modal.error(d.error.message); }
         }
     }
 }

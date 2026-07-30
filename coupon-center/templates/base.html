@@ -29,6 +29,55 @@
         [x-cloak] { display: none !important; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif; }
         .sidebar-link.active { background: rgba(59,130,246,0.1); color: #2563eb; border-right: 3px solid #3b82f6; }
+        
+        /* Modal animations */
+        @keyframes modal-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes modal-scale-in {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes modal-bounce-in {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes modal-slide-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes icon-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes checkmark-draw {
+            0% { stroke-dashoffset: 50; }
+            100% { stroke-dashoffset: 0; }
+        }
+        
+        .modal-backdrop {
+            animation: modal-fade-in 0.2s ease-out;
+        }
+        .modal-content {
+            animation: modal-scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-content.success {
+            animation: modal-bounce-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-content.error {
+            animation: modal-slide-up 0.3s ease-out;
+        }
+        .modal-icon-bounce {
+            animation: icon-bounce 0.5s ease-in-out;
+        }
+        .checkmark-animated {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            animation: checkmark-draw 0.5s ease-out forwards;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-ink">
@@ -176,7 +225,160 @@
     {% block auth_content %}{% endblock %}
 {% endif %}
 
+<!-- Global Modal Component -->
+<div x-data="globalModal()" x-show="isOpen" x-cloak @keydown.escape.window="cancel()" 
+     class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+     style="display: none;">
+    <!-- Backdrop -->
+    <div class="modal-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm" @click="cancel()"></div>
+    
+    <!-- Modal Content -->
+    <div class="modal-content relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+         :class="type"
+         @click.stop>
+        
+        <!-- Icon Section -->
+        <div class="pt-6 pb-4">
+            <div class="mx-auto w-16 h-16 rounded-full flex items-center justify-center modal-icon-bounce"
+                 :class="{
+                     'bg-emerald-100': type === 'success',
+                     'bg-red-100': type === 'error',
+                     'bg-amber-100': type === 'warning',
+                     'bg-blue-100': type === 'info',
+                     'bg-slate-100': type === 'confirm'
+                 }">
+                <!-- Success Icon -->
+                <template x-if="type === 'success'">
+                    <svg class="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path class="checkmark-animated" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </template>
+                
+                <!-- Error Icon -->
+                <template x-if="type === 'error'">
+                    <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </template>
+                
+                <!-- Warning Icon -->
+                <template x-if="type === 'warning'">
+                    <svg class="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </template>
+                
+                <!-- Info Icon -->
+                <template x-if="type === 'info'">
+                    <svg class="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </template>
+                
+                <!-- Confirm Icon -->
+                <template x-if="type === 'confirm'">
+                    <svg class="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </template>
+            </div>
+        </div>
+        
+        <!-- Content Section -->
+        <div class="px-6 pb-6 text-center">
+            <h3 class="text-lg font-bold text-ink mb-2" x-text="title"></h3>
+            <p class="text-sm text-ink-secondary" x-text="message"></p>
+            
+            <!-- Extra content slot -->
+            <div x-html="extraContent" class="mt-3"></div>
+        </div>
+        
+        <!-- Buttons Section -->
+        <div class="px-6 pb-6 flex gap-3" :class="type === 'confirm' ? 'flex-row-reverse' : ''">
+            <template x-if="type === 'confirm'">
+                <button @click="cancel()" 
+                        class="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-ink-secondary font-semibold rounded-xl transition text-sm">
+                    取消
+                </button>
+            </template>
+            <button @click="confirm()" 
+                    class="flex-1 px-4 py-2.5 font-semibold rounded-xl transition text-sm text-white"
+                    :class="{
+                        'bg-emerald-500 hover:bg-emerald-600': type === 'success',
+                        'bg-red-500 hover:bg-red-600': type === 'error',
+                        'bg-amber-500 hover:bg-amber-600': type === 'warning',
+                        'bg-blue-500 hover:bg-blue-600': type === 'info',
+                        'bg-primary-500 hover:bg-primary-600': type === 'confirm'
+                    }"
+                    x-text="type === 'confirm' ? '确定' : '好的'">
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Global Modal Manager
+    function globalModal() {
+        return {
+            isOpen: false,
+            type: 'info',
+            title: '',
+            message: '',
+            extraContent: '',
+            resolvePromise: null,
+            
+            init() {
+                // Make modal functions globally available
+                window.$modal = {
+                    success: (message, title = '成功') => this.show('success', title, message),
+                    error: (message, title = '错误') => this.show('error', title, message),
+                    warning: (message, title = '警告') => this.show('warning', title, message),
+                    info: (message, title = '提示') => this.show('info', title, message),
+                    confirm: (message, title = '确认') => this.showConfirm(title, message),
+                    custom: (type, title, message, extraContent = '') => this.show(type, title, message, extraContent)
+                };
+            },
+            
+            show(type, title, message, extraContent = '') {
+                return new Promise((resolve) => {
+                    this.type = type;
+                    this.title = title;
+                    this.message = message;
+                    this.extraContent = extraContent;
+                    this.isOpen = true;
+                    this.resolvePromise = resolve;
+                });
+            },
+            
+            showConfirm(title, message) {
+                return new Promise((resolve) => {
+                    this.type = 'confirm';
+                    this.title = title;
+                    this.message = message;
+                    this.extraContent = '';
+                    this.isOpen = true;
+                    this.resolvePromise = resolve;
+                });
+            },
+            
+            confirm() {
+                this.isOpen = false;
+                if (this.resolvePromise) {
+                    this.resolvePromise(true);
+                    this.resolvePromise = null;
+                }
+            },
+            
+            cancel() {
+                this.isOpen = false;
+                if (this.resolvePromise) {
+                    this.resolvePromise(false);
+                    this.resolvePromise = null;
+                }
+            }
+        };
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
         if(window.lucide) lucide.createIcons();
         // Register Service Worker for PWA

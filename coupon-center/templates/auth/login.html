@@ -28,7 +28,7 @@
             <h1 class="text-2xl font-bold text-slate-800 mb-1">欢迎回来</h1>
             <p class="text-slate-500 text-sm mb-8">输入您的账号信息登录系统</p>
             <div x-data="{ loading: false }">
-                <form @submit.prevent="loading=true; fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$el.querySelector('[name=username]').value,password:$el.querySelector('[name=password]').value})}).then(r=>r.json()).then(d=>{loading=false;if(d.success){window.location.href=d.data.redirect}else{alert(d.error.message)}}).catch(()=>{loading=false;alert('网络错误')})">
+                <form @submit.prevent="loading=true; fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$el.querySelector('[name=username]').value,password:$el.querySelector('[name=password]').value})}).then(r=>r.json()).then(d=>{loading=false;if(d.success){window.location.href=d.data.redirect}else{$modal.error(d.error.message)}}).catch(()=>{loading=false;$modal.error('网络错误')})">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-slate-600 mb-2">用户名</label>
                         <input type="text" name="username" id="login_username_input_a1b2" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" placeholder="请输入用户名">
@@ -58,6 +58,6 @@
 {% endblock %}
 {% block scripts %}
 <script>
-function demoLogin(u,p){document.getElementById('login_username_input_a1b2').value=u;document.getElementById('login_password_input_c3d4').value=p;fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}).then(r=>r.json()).then(d=>{if(d.success)window.location.href=d.data.redirect;else alert(d.error.message)}).catch(()=>alert('网络错误'));}
+function demoLogin(u,p){document.getElementById('login_username_input_a1b2').value=u;document.getElementById('login_password_input_c3d4').value=p;fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}).then(r=>r.json()).then(d=>{if(d.success)window.location.href=d.data.redirect;else $modal.error(d.error.message)}).catch(()=>$modal.error('网络错误'));}
 </script>
 {% endblock %}

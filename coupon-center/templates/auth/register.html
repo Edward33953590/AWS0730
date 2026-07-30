@@ -40,8 +40,8 @@
                         })
                     })
                     .then(r => r.json())
-                    .then(d => { loading = false; if (d.success) { window.location.href = d.data.redirect; } else { alert(d.error.message); } })
-                    .catch(() => { loading = false; alert('网络错误'); });
+                    .then(d => { loading = false; if (d.success) { window.location.href = d.data.redirect; } else { $modal.error(d.error.message); } })
+                    .catch(() => { loading = false; $modal.error('网络错误'); });
                 ">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-ink-secondary mb-2">用户名</label>

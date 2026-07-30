@@ -47,7 +47,7 @@ function campaignList() {
     return {
         campaigns: [],
         async init() { const r = await fetch('/api/campaigns'); const d = await r.json(); if (d.success) this.campaigns = d.data.items; },
-        async deleteCampaign(id) { if (!confirm('确定删除？')) return; const r = await fetch('/api/campaigns/'+id,{method:'DELETE'}); const d = await r.json(); if (d.success) this.init(); else alert(d.error.message); },
+        async deleteCampaign(id) { if (!await $modal.confirm('确定要删除此活动吗？', '删除确认')) return; const r = await fetch('/api/campaigns/'+id,{method:'DELETE'}); const d = await r.json(); if (d.success) { $modal.success('删除成功'); this.init(); } else $modal.error(d.error.message); },
         typeLabel(t) { return {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'}[t]||t; }
     }
 }

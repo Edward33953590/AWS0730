@@ -37,7 +37,7 @@ function editCampaign() {
     return {
         form: {}, loaded: false,
         async init() { const id='{{ campaign_id }}'; const r=await fetch('/api/campaigns/'+id); const d=await r.json(); if(d.success){this.form=d.data;this.loaded=true;} },
-        async submit() { const id='{{ campaign_id }}'; const r=await fetch('/api/campaigns/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.form)}); const d=await r.json(); if(d.success){alert('保存成功');window.location.href='/operator/campaigns';}else{alert(d.error.message);} }
+        async submit() { const id='{{ campaign_id }}'; const r=await fetch('/api/campaigns/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.form)}); const d=await r.json(); if(d.success){$modal.success('保存成功').then(()=>window.location.href='/operator/campaigns');}else{$modal.error(d.error.message);} }
     }
 }
 </script>
