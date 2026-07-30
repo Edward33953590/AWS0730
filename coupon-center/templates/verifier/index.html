@@ -7,10 +7,10 @@
     <div class="bg-white rounded-xl border border-slate-200 p-6 max-w-xl mb-8">
         <h2 class="text-sm font-semibold text-ink mb-4">输入券码核销</h2>
         <div class="flex gap-3">
-            <input x-model="couponCode" @keyup.enter="redeem()" placeholder="CPN-XXXXXXXX"
+            <input x-model="couponCode" @keyup.enter="redeem()" id="verifier_couponcode_input_x3y4" placeholder="CPN-XXXXXXXX"
                 class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-base font-mono focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition"
             >
-            <button @click="redeem()" :disabled="!couponCode || loading"
+            <button @click="redeem()" :disabled="!couponCode || loading" id="verifier_redeem_button_z5a6"
                 class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition disabled:opacity-40 shadow-sm flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-4 h-4"></i>核销
             </button>

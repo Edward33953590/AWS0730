@@ -9,8 +9,8 @@
             <div class="mb-5">
                 <label class="block text-sm font-medium text-ink-secondary mb-2">活动名称</label>
                 <div class="flex gap-2">
-                    <input x-model="form.name" required class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition" placeholder="输入活动名称">
-                    <button type="button" @click="generateCopy()" :disabled="aiLoading" class="px-3 py-2.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold rounded-lg whitespace-nowrap transition disabled:opacity-50 flex items-center gap-1">
+                    <input x-model="form.name" required id="create_name_input_b7c8" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition" placeholder="输入活动名称">
+                    <button type="button" @click="generateCopy()" :disabled="aiLoading" id="create_aicopy_button_d9e0" class="px-3 py-2.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold rounded-lg whitespace-nowrap transition disabled:opacity-50 flex items-center gap-1">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
                         <span x-show="!aiLoading">AI文案</span><span x-show="aiLoading">生成中...</span>
                     </button>
@@ -24,7 +24,7 @@
             <!-- Type -->
             <div class="mb-5">
                 <label class="block text-sm font-medium text-ink-secondary mb-2">优惠券类型</label>
-                <select x-model="form.type" @change="onTypeChange()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition">
+                <select x-model="form.type" @change="onTypeChange()" id="create_type_select_f1g2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition">
                     <option value="FULL_REDUCTION">满减券</option>
                     <option value="DISCOUNT">折扣券</option>
                     <option value="NO_THRESHOLD">无门槛券</option>
@@ -99,7 +99,7 @@
 
             <!-- Actions -->
             <div class="flex gap-3">
-                <button type="submit" :disabled="submitting" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 shadow-sm">
+                <button type="submit" :disabled="submitting" id="create_submit_button_h3i4" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 shadow-sm">
                     <span x-show="!submitting">创建活动</span><span x-show="submitting">创建中...</span>
                 </button>
                 <a href="/operator/campaigns" class="px-5 py-2.5 bg-white border border-slate-200 text-ink-secondary text-sm font-medium rounded-lg hover:bg-slate-50 transition">取消</a>

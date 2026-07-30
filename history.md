@@ -283,3 +283,85 @@ T-003 → T-011 → T-012/T-013/T-014/T-015
 - 技术栈：Flask + SQLite + TailwindCSS CDN + Alpine.js + Chart.js + boto3
 - 启动命令：`pip install -r requirements.txt && python seed.py && python app.py`
 - 访问地址：http://localhost:5000
+
+
+---
+
+## 2026-07-29 Debug与功能完善
+
+### 问题修复：admin登录返回500
+- **原因**：`db = SQLAlchemy()` 定义在 `app.py` 中，models通过 `from app import db` 导入形成循环依赖。Flask debug reloader重启时导致SQLAlchemy实例与Flask app不匹配。
+- **错误信息**：`RuntimeError: The current Flask app is not registered with this 'SQLAlchemy' instance.`
+- **修复**：创建独立的 `extensions.py` 文件，将 db/migrate/login_manager/csrf 移入，所有文件从 extensions 导入。
+- **受影响文件**：11个model文件 + 8个service文件 + routes/api.py + seed.py
+
+### 功能：演示模式快速登录
+- 在登录页面底部添加"演示模式 - 快速登录"区域
+- 4个按钮（管理员/运营/核销/用户）点击即自动填入账号密码并登录跳转
+- 用于竞赛演示时快速切换角色
+
+### 功能：AI文案生成不降级
+- 修改 `ai_copy_service.py`：AI调用失败时不再使用模板降级，而是返回错误信息
+- 前端显示红色错误提示："AI文案生成失败" + 具体错误原因
+- 其他AI功能（推荐/风控/画像）保留降级方案不变
+
+### Bedrock API Key模式适配
+- 修改 `bedrock_service.py` 支持 Bearer Token（API Key）模式
+- 优先级：如果 `AWS_BEARER_TOKEN_BEDROCK` 有值则用HTTP Bearer方式调用，否则用boto3 SDK
+- 属性改为延迟读取（@property），避免模块加载时环境变量还未加载
+- 配置文件：`.env` 中添加 `AWS_BEARER_TOKEN_BEDROCK` 字段
+- **发现问题**：Workshop环境的IAM策略(`ws-default-policy`)显式deny了 `bedrock:CallWithBearerToken` 操作，需要用SDK凭证模式或让管理员开放权限
+
+---
+
+## 2026-07-29 UI全面重构 - 浅色蓝色调主题
+
+### 设计方向
+- 参考 `templates/example/` 中的 admin-dashboard-0.html 和 login-0.html 设计模式
+- 统一浅色系 + 蓝色调搭配
+- 侧边栏固定导航 + 粘性顶栏 + 白色卡片布局
+
+### 设计规范
+- **背景**：`slate-50`（浅灰蓝）
+- **卡片**：白色 `bg-white` + `rounded-xl` + `border-slate-200`
+- **主色调**：`primary-500`(#3b82f6) ~ `primary-700`(#1d4ed8)
+- **文字**：ink(#1e293b) / ink-secondary(#475569) / ink-muted(#94a3b8)
+- **侧边栏**：白底固定左侧，蓝色高亮活跃项，角色对应不同导航链接
+- **顶栏**：粘性，毛玻璃效果 `backdrop-blur-md`
+- **按钮**：蓝色渐变主按钮 + 白色描边次按钮
+- **标签**：小圆角药丸形状 `rounded-full text-[11px]`
+
+### 更新的文件清单
+
+| 文件 | 更新内容 |
+|------|----------|
+| `base.html` | 完全重写：侧边栏布局、4种角色导航、顶栏铃铛、用户信息 |
+| `auth/login.html` | 分屏布局：左蓝色品牌面板+右白色表单+快速登录按钮 |
+| `auth/register.html` | 同上分屏风格，角色选择下拉 |
+| `user/index.html` | AI推荐卡片网格+快捷入口图标卡片 |
+| `user/explore.html` | 类型筛选药丸+优惠券卡片+进度条+收藏心 |
+| `user/coupons.html` | 状态筛选+券列表+状态标签+出示券码按钮 |
+| `user/favorites.html` | 收藏列表卡片 |
+| `user/ranking.html` | 排行榜表格+排名徽章 |
+| `user/notifications.html` | 通知列表+未读高亮蓝色左边框 |
+| `operator/index.html` | 活动管理表格 |
+| `operator/campaigns.html` | 活动列表表格+状态/类型标签+操作链接 |
+| `operator/create.html` | 创建表单+AI文案按钮+类型参数面板+高级设置 |
+| `operator/edit.html` | 编辑表单 |
+| `operator/templates.html` | 占位卡片 |
+| `operator/batch.html` | 占位卡片 |
+| `operator/blacklist.html` | 占位卡片 |
+| `verifier/index.html` | 券码输入+核销按钮+结果卡片+记录表格 |
+| `admin/dashboard.html` | KPI卡片(5个)+Chart.js折线图/环形图+领取率核销率 |
+| `admin/logs.html` | 操作日志表格+操作类型标签 |
+| `admin/export.html` | 导出下载卡片 |
+| `admin/risk.html` | 占位卡片 |
+| `admin/profiles.html` | 占位卡片 |
+| `share.html` | 分享领券页面 |
+
+### 技术要点
+- 解决了Jinja2模板中 `{% block content %}` 重复定义问题：认证页面使用 `{% block auth_content %}`，功能页面使用 `{% block content %}`
+- TailwindCSS通过CDN + tailwind.config自定义颜色
+- Alpine.js处理所有前端交互
+- Chart.js处理图表
+- Lucide图标库
