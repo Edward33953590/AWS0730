@@ -29,9 +29,9 @@ def notify_claim_success(user_id, campaign_name, coupon_code):
 
 def notify_transfer_received(user_id, from_username, campaign_name):
     """Notify user of received transfer."""
-    create_notification(user_id, 'TRANSFER_RECEIVED', f'{from_username} 转赠了「{campaign_name}」给�?)
+    create_notification(user_id, 'TRANSFER_RECEIVED', f'{from_username} 转赠了「{campaign_name}」给你')
 
 
 def notify_risk_blocked(user_id, reason):
     """Notify user of risk block."""
-    create_notification(user_id, 'RISK_BLOCKED', f'您的操作被风控拦�? {reason}')
+    create_notification(user_id, 'RISK_BLOCKED', f'您的操作被风控拦截: {reason}')

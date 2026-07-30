@@ -78,6 +78,9 @@ def claim_coupon(user_id, campaign_id):
         db.session.rollback()
         return None, 'OUT_OF_STOCK', '库存不足'
 
+    # Refresh campaign to get updated remaining_stock from database
+    db.session.refresh(campaign)
+
     # Create coupon
     coupon = Coupon(
         id=str(uuid.uuid4()),
