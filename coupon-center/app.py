@@ -27,6 +27,7 @@ def create_app(config_class=Config):
     from routes.admin import admin_bp
     from routes.api import api_bp
     from routes.share import share_bp
+    from routes.scan import scan_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp, url_prefix='/user')
@@ -35,6 +36,7 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(share_bp)
+    app.register_blueprint(scan_bp)
 
     # Exempt API from CSRF (uses JWT)
     csrf.exempt(api_bp)
@@ -60,4 +62,4 @@ if __name__ == '__main__':
     app = create_app()
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000)

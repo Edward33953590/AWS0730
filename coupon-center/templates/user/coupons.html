@@ -26,8 +26,11 @@
                         <span x-text="'有效期至 ' + formatDate(c.expires_at)"></span>
                     </div>
                 </div>
-                <div class="ml-4 flex-shrink-0" x-show="c.status === 'CLAIMED'">
-                    <button @click="showCode(c)" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition">
+                <div class="ml-4 flex-shrink-0 flex gap-2">
+                    <a :href="'/user/coupons/' + c.id" class="px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                        <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> 详情
+                    </a>
+                    <button x-show="c.status === 'CLAIMED'" @click="showCode(c)" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition">
                         出示券码
                     </button>
                 </div>

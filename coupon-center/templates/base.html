@@ -7,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
@@ -173,7 +177,13 @@
 {% endif %}
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => { if(window.lucide) lucide.createIcons(); });
+    document.addEventListener('DOMContentLoaded', () => {
+        if(window.lucide) lucide.createIcons();
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+        }
+    });
 </script>
 {% block scripts %}{% endblock %}
 </body>

@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}核销记录 - 优惠券中心{% endblock %}
+{% block page_title %}核销记录{% endblock %}
+{% block content %}
+<div x-data="recordsPage()" x-init="init()">
+    <!-- 统计卡片 -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 text-center">
+            <div class="text-2xl font-bold text-ink" x-text="stats.total"></div>
+            <div class="text-xs text-ink-muted mt-1">总核销数</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 text-center">
+            <div class="text-2xl font-bold text-emerald-600" x-text="stats.today"></div>
+            <div class="text-xs text-ink-muted mt-1">今日核销</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 text-center col-span-2 sm:col-span-1">
+            <div class="text-2xl font-bold text-primary-600" x-text="stats.week"></div>
+            <div class="text-xs text-ink-muted mt-1">本周核销</div>
+        </div>
+    </div>
+
+    <!-- 搜索/筛选 -->
+    <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4">
+        <div class="flex gap-2">
+            <input x-model="search" @input="filterRecords()" type="text" placeholder="搜索券码或活动名称..."
+                class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition"
+            >
+            <select x-model="sortOrder" @change="sortRecords()" class="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-ink-secondary outline-none focus:ring-2 focus:ring-primary-500/20">
+                <option value="desc">最新优先</option>
+                <option value="asc">最早优先</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 桌面端：表格视图 -->
+    <div class="hidden md:block bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">核销时间</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">券码</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">活动名称</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">核销员</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                <template x-for="r in displayRecords" :key="r.id">
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 text-xs text-ink-secondary whitespace-nowrap" x-text="formatTime(r.redeemed_at)"></td>
+                        <td class="px-4 py-3 text-xs font-mono text-ink font-semibold" x-text="r.coupon_code"></td>
+                        <td class="px-4 py-3 text-xs text-ink-secondary" x-text="r.campaign_name"></td>
+                        <td class="px-4 py-3 text-xs text-ink-secondary" x-text="r.verifier_name || '--'"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        <div x-show="displayRecords.length === 0" class="text-center py-16 text-ink-muted text-sm">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+            <p>暂无核销记录</p>
+        </div>
+    </div>
+
+    <!-- 移动端：卡片视图 -->
+    <div class="md:hidden space-y-3">
+        <template x-for="r in displayRecords" :key="r.id">
+            <div class="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-mono font-bold text-ink" x-text="r.coupon_code"></span>
+                    <span class="text-[11px] text-ink-muted" x-text="formatTime(r.redeemed_at)"></span>
+                </div>
+                <div class="text-sm text-ink-secondary" x-text="r.campaign_name"></div>
+                <div x-show="r.verifier_name" class="text-[11px] text-ink-muted mt-1">
+                    核销员：<span x-text="r.verifier_name"></span>
+                </div>
+            </div>
+        </template>
+        <div x-show="displayRecords.length === 0" class="text-center py-16 text-ink-muted text-sm">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+            <p>暂无核销记录</p>
+        </div>
+    </div>
+
+    <!-- 分页 -->
+    <div x-show="totalPages > 1" class="flex items-center justify-between mt-4">
+        <div class="text-xs text-ink-muted">
+            共 <span x-text="totalRecords"></span> 条记录
+        </div>
+        <div class="flex gap-1">
+            <button @click="goPage(currentPage - 1)" :disabled="currentPage <= 1"
+                class="px-3 py-1.5 text-xs rounded-lg border border-slate-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition">
+                上一页
+            </button>
+            <template x-for="p in pageNumbers" :key="p">
+                <button @click="goPage(p)"
+                    class="px-3 py-1.5 text-xs rounded-lg border transition"
+                    :class="p === currentPage ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 hover:bg-slate-50'">
+                    <span x-text="p"></span>
+                </button>
+            </template>
+            <button @click="goPage(currentPage + 1)" :disabled="currentPage >= totalPages"
+                class="px-3 py-1.5 text-xs rounded-lg border border-slate-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition">
+                下一页
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function recordsPage() {
+    return {
+        records: [],
+        search: '',
+        sortOrder: 'desc',
+        currentPage: 1,
+        pageSize: 15,
+        stats: { total: 0, today: 0, week: 0 },
+        init() {
+            this.loadRecords();
+        },
+        get totalRecords() { return this.filteredRecords.length; },
+        get totalPages() { return Math.max(1, Math.ceil(this.filteredRecords.length / this.pageSize)); },
+        get filteredRecords() {
+            let list = this.records;
+            if (this.search) {
+                const q = this.search.toLowerCase();
+                list = list.filter(r =>
+                    (r.coupon_code && r.coupon_code.toLowerCase().includes(q)) ||
+                    (r.campaign_name && r.campaign_name.toLowerCase().includes(q))
+                );
+            }
+            return list;
+        },
+        get displayRecords() {
+            let list = [...this.filteredRecords];
+            if (this.sortOrder === 'asc') {
+                list.reverse();
+            }
+            const start = (this.currentPage - 1) * this.pageSize;
+            return list.slice(start, start + this.pageSize);
+        },
+        get pageNumbers() {
+            const pages = [];
+            const total = this.totalPages;
+            const current = this.currentPage;
+            let start = Math.max(1, current - 2);
+            let end = Math.min(total, current + 2);
+            for (let i = start; i <= end; i++) pages.push(i);
+            return pages;
+        },
+        async loadRecords() {
+            try {
+                const res = await fetch('/api/redeem/records');
+                const data = await res.json();
+                if (data.success) {
+                    this.records = data.data.items;
+                    this.calcStats();
+                }
+            } catch(e) {
+                console.error('加载核销记录失败', e);
+            }
+            this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+        },
+        calcStats() {
+            const now = new Date();
+            const today = now.toISOString().substring(0, 10);
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+            const weekStartStr = weekStart.toISOString().substring(0, 10);
+            this.stats.total = this.records.length;
+            this.stats.today = this.records.filter(r => r.redeemed_at && r.redeemed_at.substring(0, 10) === today).length;
+            this.stats.week = this.records.filter(r => r.redeemed_at && r.redeemed_at.substring(0, 10) >= weekStartStr).length;
+        },
+        filterRecords() {
+            this.currentPage = 1;
+        },
+        sortRecords() {
+            this.currentPage = 1;
+        },
+        goPage(p) {
+            if (p < 1 || p > this.totalPages) return;
+            this.currentPage = p;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        formatTime(t) {
+            return t ? t.substring(0, 16).replace('T', ' ') : '';
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -16,4 +16,4 @@ def index():
 @role_required('VERIFIER')
 def records():
     """Redemption records page."""
-    return render_template('verifier/index.html')
+    return render_template('verifier/records.html')

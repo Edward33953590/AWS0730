@@ -1,6 +1,7 @@
 """Redemption service - coupon verification/redemption logic."""
 import uuid
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 from models.coupon import Coupon
 from models.redemption import Redemption
 from extensions import db
@@ -9,6 +10,8 @@ from extensions import db
 def redeem_coupon(coupon_code, verifier_id):
     """
     Redeem a coupon by code. Idempotent - returns same result on repeat calls.
+    Uses IntegrityError handling to prevent race condition when two concurrent
+    requests try to redeem the same coupon simultaneously.
     Returns (result_dict, error_code, error_message, http_status).
     """
     coupon = Coupon.query.filter_by(coupon_code=coupon_code).first()
@@ -40,7 +43,8 @@ def redeem_coupon(coupon_code, verifier_id):
     if coupon.status != 'CLAIMED':
         return None, 'INVALID_STATUS', f'券状态异常: {coupon.status}', 400
 
-    # Perform redemption
+    # Perform redemption — use try/except IntegrityError to handle
+    # concurrent requests racing on the same coupon
     now = datetime.utcnow()
     coupon.status = 'REDEEMED'
     coupon.used_at = now
@@ -53,7 +57,25 @@ def redeem_coupon(coupon_code, verifier_id):
         redeemed_at=now,
     )
     db.session.add(redemption)
-    db.session.commit()
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        # Race condition: another concurrent request redeemed this coupon first.
+        # Re-query current state and return proper response.
+        coupon = Coupon.query.filter_by(coupon_code=coupon_code).first()
+        if coupon and coupon.status == 'REDEEMED':
+            existing = Redemption.query.filter_by(coupon_id=coupon.id).first()
+            return {
+                'status': 'ALREADY_REDEEMED',
+                'coupon_code': coupon_code,
+                'campaign_name': coupon.campaign.name if coupon.campaign else '',
+                'redeemed_at': existing.redeemed_at.isoformat() if existing else None,
+                'message': '该券已被核销（并发）',
+            }, 'ALREADY_REDEEMED', '该券已被核销', 200
+        # Unexpected — re-raise if coupon wasn't in REDEEMED state
+        raise
 
     # Log the operation
     from services.log_service import log_operation
@@ -63,7 +85,7 @@ def redeem_coupon(coupon_code, verifier_id):
     result = {
         'status': 'REDEEMED',
         'coupon_code': coupon_code,
-        'campaign_name': coupon.campaign.name if coupon.campaign else '',
+        'coupon_name': coupon.campaign.name if coupon.campaign else '',
         'redeemed_at': now.isoformat(),
     }
     return result, None, None, 200

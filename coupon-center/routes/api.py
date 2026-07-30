@@ -1,6 +1,9 @@
 """JSON API routes - used by frontend AJAX calls."""
 import uuid
+import logging
 from flask import Blueprint, jsonify, request
+
+logger = logging.getLogger(__name__)
 from flask_login import login_user, logout_user, login_required, current_user
 from models.user import User
 from models.campaign import Campaign
@@ -238,13 +241,20 @@ def redeem_coupon():
     from services.redemption_service import redeem_coupon as svc_redeem
     data = request.get_json()
     if not data or not data.get('coupon_code'):
+        logger.warning('核销失败: 未提供券码')
         return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '请输入券码'}}), 400
     coupon_code = data['coupon_code'].strip().upper()
+    logger.info(f'核销请求: coupon_code={coupon_code}, verifier_id={current_user.id}, verifier={current_user.username}')
+
     result, error_code, error_msg, status = svc_redeem(coupon_code, current_user.id)
     if error_code:
         if error_code == 'ALREADY_REDEEMED' and result:
+            logger.info(f'核销结果: {coupon_code} -> 已核销(幂等)')
             return jsonify({'success': True, 'data': result}), 200
+        logger.warning(f'核销失败: {coupon_code} -> error_code={error_code}, error_msg={error_msg}')
         return jsonify({'success': False, 'error': {'code': error_code, 'message': error_msg}}), status
+
+    logger.info(f'核销成功: {coupon_code} -> verifier={current_user.username}')
     return jsonify({'success': True, 'data': result})
 
 
