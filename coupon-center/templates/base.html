@@ -129,7 +129,7 @@
             <div class="flex items-center gap-4">
                 <!-- Notification bell -->
                 <div x-data="{ open: false, unread: 0 }" x-init="fetch('/api/notifications/unread-count').then(r=>r.json()).then(d=>{if(d.success) unread=d.data.count})" class="relative">
-                    <button @click="open=!open" class="relative w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-ink-secondary hover:bg-primary-50 hover:text-primary-600 transition">
+                    <button @click="open=!open" id="base_notification_button_j2k3" class="relative w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-ink-secondary hover:bg-primary-50 hover:text-primary-600 transition">
                         <i data-lucide="bell" class="w-4 h-4"></i>
                         <span x-show="unread>0" x-text="unread" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center"></span>
                     </button>

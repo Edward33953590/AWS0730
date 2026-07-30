@@ -5,10 +5,10 @@
 <div x-data="couponPage()" x-init="init()">
     <!-- Status Filter -->
     <div class="flex gap-2 mb-5">
-        <button @click="filter=''; loadCoupons()" :class="filter==='' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">全部</button>
-        <button @click="filter='CLAIMED'; loadCoupons()" :class="filter==='CLAIMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">待使用</button>
-        <button @click="filter='REDEEMED'; loadCoupons()" :class="filter==='REDEEMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已核销</button>
-        <button @click="filter='EXPIRED'; loadCoupons()" :class="filter==='EXPIRED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已过期</button>
+        <button @click="filter=''; loadCoupons()" id="coupons_filterall_button_r0s1" :class="filter==='' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">全部</button>
+        <button @click="filter='CLAIMED'; loadCoupons()" id="coupons_filterclaimed_button_t2u3" :class="filter==='CLAIMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">待使用</button>
+        <button @click="filter='REDEEMED'; loadCoupons()" id="coupons_filterredeemed_button_v4w5" :class="filter==='REDEEMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已核销</button>
+        <button @click="filter='EXPIRED'; loadCoupons()" id="coupons_filterexpired_button_x6y7" :class="filter==='EXPIRED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已过期</button>
     </div>
 
     <!-- Coupon List -->

@@ -4,7 +4,7 @@
 {% block content %}
 <div x-data="notifPage()" x-init="init()">
     <div class="flex justify-end mb-4">
-        <button @click="markAllRead()" class="text-xs text-primary-600 font-medium hover:underline">全部已读</button>
+        <button @click="markAllRead()" id="notifications_markallread_button_z8a9" class="text-xs text-primary-600 font-medium hover:underline">全部已读</button>
     </div>
     <div class="space-y-2">
         <template x-for="n in notifications" :key="n.id">

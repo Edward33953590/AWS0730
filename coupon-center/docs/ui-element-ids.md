@@ -51,7 +51,79 @@
 
 ---
 
-## 5. 动态渲染组件（Alpine.js x-for 模板内）
+## 3. 核销页面 `/verifier`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `verifier_couponcode_input_x3y4` | input[text] | 券码输入框 | 输入券码(如CPN-A3X9K2M7) |
+| `verifier_redeem_button_z5a6` | button | 核销按钮 | 点击核销 |
+
+---
+
+## 4. 运营-创建活动页面 `/operator/campaigns/create`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `create_name_input_b7c8` | input[text] | 活动名称输入框 | 输入活动名称 |
+| `create_aicopy_button_d9e0` | button | AI文案生成按钮 | 点击生成AI营销文案 |
+| `create_type_select_f1g2` | select | 优惠券类型选择 | 选择: FULL_REDUCTION/DISCOUNT/NO_THRESHOLD/ADD_ON/CATEGORY/NEWCOMER/TIME_LIMITED |
+| `create_submit_button_h3i4` | button[submit] | 创建活动提交按钮 | 点击创建活动 |
+
+---
+
+## 5. 全局组件 (base.html)
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `base_notification_button_j2k3` | button | 顶栏通知铃铛按钮 | 点击展开通知 |
+
+---
+
+## 6. 管理员-数据导出 `/admin/export`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `export_claims_link_l4m5` | a[href] | 导出领券记录(CSV)链接 | 点击下载CSV文件 |
+
+---
+
+## 7. 分享领券页面 `/share/:code`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `share_claim_button_n6o7` | button | 分享链接领取按钮 | 点击领取优惠券 |
+| `share_gotologin_link_p8q9` | a[href] | 未登录时跳转登录链接 | 点击跳转登录页 |
+
+---
+
+## 8. 用户-我的券包 `/user/coupons`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `coupons_filterall_button_r0s1` | button | 筛选-全部 | 显示所有券 |
+| `coupons_filterclaimed_button_t2u3` | button | 筛选-待使用 | 只显示待使用的券 |
+| `coupons_filterredeemed_button_v4w5` | button | 筛选-已核销 | 只显示已核销的券 |
+| `coupons_filterexpired_button_x6y7` | button | 筛选-已过期 | 只显示已过期的券 |
+
+---
+
+## 9. 用户-通知页面 `/user/notifications`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `notifications_markallread_button_z8a9` | button | 全部已读按钮 | 将所有通知标为已读 |
+
+---
+
+## 10. 用户-首页 `/user`
+
+| ID | 类型 | 功能说明 | 操作 |
+|----|------|----------|------|
+| `userhome_refresh_button_b1c2` | button | 刷新AI推荐按钮 | 重新加载AI推荐列表 |
+
+---
+
+## 11. 动态渲染组件（Alpine.js x-for 模板内）
 
 以下组件通过 Alpine.js 动态渲染，无固定 ID，需通过选择器定位：
 
@@ -79,7 +151,7 @@
 
 ---
 
-## 6. 侧边栏导航链接
+## 12. 侧边栏导航链接
 
 | 选择器 | 角色 | 目标页面 |
 |--------|------|----------|
@@ -105,7 +177,7 @@
 
 ---
 
-## 7. API 接口（配合自动化测试）
+## 13. API 接口（配合自动化测试）
 
 | 方法 | 路径 | 用途 | 请求体 |
 |------|------|------|--------|
@@ -134,7 +206,7 @@
 
 ---
 
-## 8. 自动化测试示例流程
+## 14. 自动化测试示例流程
 
 ```python
 # 示例：Selenium 自动化演示流程
