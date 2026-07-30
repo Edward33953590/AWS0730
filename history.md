@@ -365,3 +365,27 @@ T-003 → T-011 → T-012/T-013/T-014/T-015
 - Alpine.js处理所有前端交互
 - Chart.js处理图表
 - Lucide图标库
+
+
+---
+
+## 2026-07-30 修复出示券码弹窗 & 添加线上核销提交功能
+
+### 变更内容
+- 修复"出示券码"弹窗无法全选文字复制的问题：将 `alert()` 替换为自定义 Modal 弹窗，使用 `input[readonly]` + 自动全选实现券码可复制
+- 在弹窗中新增"复制券码"按钮（使用 Clipboard API，兼容 execCommand 降级）
+- 新增"提交线上核销"按钮：用户点击后调用 API，系统自动通知所有核销人员
+- 后端新增 `POST /api/coupons/submit-redeem` 接口：验证券码有效性后向所有 VERIFIER 角色用户发送通知
+
+### 受影响的文件
+- `coupon-center/templates/user/coupons.html` — 前端 Modal 弹窗重写
+- `coupon-center/templates/verifier/index.html` — 核销人员界面新增线上核销请求列表
+- `coupon-center/routes/api.py` — 新增线上核销提交 API + 核销请求列表 API
+- `coupon-center/docs/ui-element-ids.md` — 新增 5 个 UI 元素 ID + 2 个 API 接口
+
+### 技术决策
+- 使用 `input[readonly]` 而非 `<p>` 或 `<span>` 来显示券码，因为 input 天然支持 `select()` 全选操作，用户体验更好
+- 通知类型使用 `ONLINE_REDEEM_REQUEST`，核销人员在通知列表中可看到券码和用户信息
+- 线上核销提交仅发送通知，不直接执行核销，核销操作仍由核销人员确认完成
+- 核销人员界面顶部展示未处理的线上核销请求列表，可一键核销或忽略
+- 新增 `GET /api/redeem/online-requests` 接口供核销人员获取待处理请求

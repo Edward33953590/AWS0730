@@ -37,6 +37,8 @@
 |----|------|----------|------|
 | `verifier_couponcode_input_x3y4` | input[text] | 券码输入框 | 输入券码(如CPN-A3X9K2M7) |
 | `verifier_redeem_button_z5a6` | button | 核销按钮 | 点击核销 |
+| `verifier_onlineredeem_button_t1u2` | button | 线上核销请求-核销按钮 | 点击直接核销该线上请求的券码 |
+| `verifier_dismissreq_button_v3w4` | button | 线上核销请求-忽略按钮 | 点击忽略该请求（标记已读） |
 
 ---
 
@@ -57,6 +59,8 @@
 |----|------|----------|------|
 | `verifier_couponcode_input_x3y4` | input[text] | 券码输入框 | 输入券码(如CPN-A3X9K2M7) |
 | `verifier_redeem_button_z5a6` | button | 核销按钮 | 点击核销 |
+| `verifier_onlineredeem_button_t1u2` | button | 线上核销请求-核销按钮 | 点击直接核销该线上请求的券码 |
+| `verifier_dismissreq_button_v3w4` | button | 线上核销请求-忽略按钮 | 点击忽略该请求（标记已读） |
 
 ---
 
@@ -104,6 +108,9 @@
 | `coupons_filterclaimed_button_t2u3` | button | 筛选-待使用 | 只显示待使用的券 |
 | `coupons_filterredeemed_button_v4w5` | button | 筛选-已核销 | 只显示已核销的券 |
 | `coupons_filterexpired_button_x6y7` | button | 筛选-已过期 | 只显示已过期的券 |
+| `coupons_code_display_input_m3n4` | input[text,readonly] | 出示券码弹窗-券码显示输入框 | 点击/聚焦自动全选，可复制 |
+| `coupons_copycode_button_p5q6` | button | 出示券码弹窗-复制券码按钮 | 点击复制券码到剪贴板 |
+| `coupons_onlineredeem_button_r7s8` | button | 出示券码弹窗-提交线上核销按钮 | 点击提交核销请求，通知核销人员 |
 
 ---
 
@@ -145,7 +152,7 @@
 
 | 选择器 | 功能说明 | 操作 |
 |--------|----------|------|
-| `button:contains('出示券码')` | 出示券码按钮 | 点击显示券码(alert) |
+| `button:contains('出示券码')` | 出示券码按钮 | 点击打开券码弹窗Modal |
 | `button:contains('全部')` | 状态筛选-全部 | 切换显示全部券 |
 | `button:contains('待使用')` | 状态筛选-待使用 | 切换显示待使用券 |
 
@@ -185,9 +192,11 @@
 | POST | `/api/auth/register` | 注册 | `{"username":"xxx","password":"xxx","role":"USER"}` |
 | GET | `/api/auth/me` | 当前用户 | - |
 | POST | `/api/coupons/claim` | 领券 | `{"campaign_id":"xxx"}` |
+| POST | `/api/coupons/submit-redeem` | 用户提交线上核销 | `{"coupon_code":"CPN-XXXXXXXX"}` |
 | GET | `/api/coupons/my` | 我的券包 | - |
 | POST | `/api/redeem` | 核销 | `{"coupon_code":"CPN-XXXXXXXX"}` |
 | GET | `/api/redeem/records` | 核销记录 | - |
+| GET | `/api/redeem/online-requests` | 线上核销请求列表(核销人员) | - |
 | GET | `/api/campaigns` | 活动列表 | - |
 | POST | `/api/campaigns` | 创建活动 | `{"name":"xx","type":"FULL_REDUCTION","params":{},"total_stock":100}` |
 | POST | `/api/ai/recommend` | AI推荐 | - |

@@ -3,6 +3,38 @@
 {% block page_title %}优惠券核销{% endblock %}
 {% block content %}
 <div x-data="verifierPage()" x-init="init()">
+    <!-- Online Redeem Requests -->
+    <div class="mb-8" x-show="onlineRequests.length > 0">
+        <div class="flex items-center gap-2 mb-3">
+            <h2 class="text-sm font-semibold text-ink">线上核销请求</h2>
+            <span class="bg-amber-100 text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded-full" x-text="onlineRequests.length + ' 条待处理'"></span>
+        </div>
+        <div class="space-y-3">
+            <template x-for="req in onlineRequests" :key="req.id">
+                <div class="bg-white rounded-xl border border-amber-200 p-4 flex items-center justify-between hover:shadow-sm transition">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">线上请求</span>
+                            <span class="text-[11px] text-ink-muted" x-text="req.created_at ? req.created_at.substring(0,16).replace('T',' ') : ''"></span>
+                        </div>
+                        <p class="text-sm text-ink" x-text="req.content"></p>
+                        <p class="text-xs font-mono text-primary-600 mt-1" x-text="extractCode(req.content)"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex gap-2">
+                        <button @click="redeemOnline(req)" id="verifier_onlineredeem_button_t1u2"
+                            class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>核销
+                        </button>
+                        <button @click="dismissRequest(req)" id="verifier_dismissreq_button_v3w4"
+                            class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-ink-secondary text-xs font-medium rounded-lg transition">
+                            忽略
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
     <!-- Redeem Card -->
     <div class="bg-white rounded-xl border border-slate-200 p-6 max-w-xl mb-8">
         <h2 class="text-sm font-semibold text-ink mb-4">输入券码核销</h2>
@@ -60,7 +92,30 @@ function verifierPage() {
         couponCode:'', loading:false,
         result:null, resultClass:'', resultTitle:'', resultMsg:'',
         records: [],
-        init() { this.loadRecords(); },
+        onlineRequests: [],
+        init() { this.loadRecords(); this.loadOnlineRequests(); },
+        async loadOnlineRequests() {
+            const r = await fetch('/api/redeem/online-requests');
+            const d = await r.json();
+            if (d.success) this.onlineRequests = d.data.items;
+        },
+        extractCode(content) {
+            const match = content ? content.match(/CPN-[A-Z0-9]+/) : null;
+            return match ? match[0] : '';
+        },
+        async redeemOnline(req) {
+            const code = this.extractCode(req.content);
+            if (!code) return;
+            this.couponCode = code;
+            await this.redeem();
+            // Mark notification as read
+            await fetch('/api/notifications/' + req.id + '/read', { method: 'PUT' });
+            this.onlineRequests = this.onlineRequests.filter(r => r.id !== req.id);
+        },
+        async dismissRequest(req) {
+            await fetch('/api/notifications/' + req.id + '/read', { method: 'PUT' });
+            this.onlineRequests = this.onlineRequests.filter(r => r.id !== req.id);
+        },
         async redeem() {
             if (!this.couponCode) return;
             this.loading=true; this.result=null;

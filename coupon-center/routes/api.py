@@ -212,6 +212,26 @@ def get_logs():
 
 # ==================== Redemption API ====================
 
+@api_bp.route('/redeem/online-requests', methods=['GET'])
+@role_required('VERIFIER')
+def online_redeem_requests():
+    """Get pending online redemption requests for verifiers."""
+    from models.notification import Notification
+    notifs = Notification.query.filter_by(
+        user_id=current_user.id,
+        type='ONLINE_REDEEM_REQUEST',
+        read=False
+    ).order_by(Notification.created_at.desc()).limit(50).all()
+    items = []
+    for n in notifs:
+        items.append({
+            'id': n.id,
+            'content': n.content,
+            'created_at': n.created_at.isoformat() if n.created_at else None,
+        })
+    return jsonify({'success': True, 'data': {'items': items}})
+
+
 @api_bp.route('/redeem', methods=['POST'])
 @role_required('VERIFIER')
 def redeem_coupon():
@@ -239,6 +259,48 @@ def redemption_records():
 
 
 # ==================== Coupons API ====================
+
+@api_bp.route('/coupons/submit-redeem', methods=['POST'])
+@role_required('USER')
+def submit_online_redeem():
+    """User submits coupon for online redemption - notifies all verifiers."""
+    from models.coupon import Coupon
+    from models.notification import Notification
+    from services.notification_service import create_notification
+    data = request.get_json()
+    if not data or not data.get('coupon_code'):
+        return jsonify({'success': False, 'error': {'code': 'BAD_REQUEST', 'message': '请提供券码'}}), 400
+    coupon_code = data['coupon_code'].strip().upper()
+    coupon = Coupon.query.filter_by(coupon_code=coupon_code, user_id=current_user.id).first()
+    if not coupon:
+        return jsonify({'success': False, 'error': {'code': 'NOT_FOUND', 'message': '券码不存在或不属于当前用户'}}), 404
+    if coupon.status != 'CLAIMED':
+        return jsonify({'success': False, 'error': {'code': 'INVALID_STATUS', 'message': '该券已核销或已过期'}}), 400
+    if coupon.is_expired:
+        return jsonify({'success': False, 'error': {'code': 'EXPIRED', 'message': '该券已过期'}}), 400
+    # Check if already submitted (unread notification exists for this code)
+    existing = Notification.query.filter(
+        Notification.type == 'ONLINE_REDEEM_REQUEST',
+        Notification.read == False,
+        Notification.content.contains(coupon_code)
+    ).first()
+    if existing:
+        return jsonify({'success': False, 'error': {'code': 'ALREADY_SUBMITTED', 'message': '已提交核销请求，请等待核销人员处理'}}), 409
+    # Notify all verifiers
+    verifiers = User.query.filter_by(role='VERIFIER').all()
+    campaign_name = ''
+    if coupon.campaign:
+        campaign_name = coupon.campaign.name
+    for v in verifiers:
+        create_notification(
+            v.id,
+            'ONLINE_REDEEM_REQUEST',
+            f'用户 {current_user.username} 提交了线上核销请求，券码: {coupon_code}，活动: {campaign_name}'
+        )
+    from services.log_service import log_operation
+    log_operation(current_user.id, 'SUBMIT_ONLINE_REDEEM', coupon_code, {'campaign_name': campaign_name})
+    return jsonify({'success': True, 'data': {'message': '已通知核销人员'}})
+
 
 @api_bp.route('/coupons/claim', methods=['POST'])
 @role_required('USER')
