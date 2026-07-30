@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 {% block title %}创建活动 - 优惠券中心{% endblock %}
+{% block page_title %}创建优惠券活动{% endblock %}
 {% block content %}
 <div x-data="createCampaign()" x-init="init()">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">创建优惠券活动</h1>
-    <div class="bg-white rounded-xl shadow-sm border p-6 max-w-3xl">
+    <div class="bg-white rounded-xl border border-slate-200 p-6 max-w-3xl">
         <form @submit.prevent="submit()">
-            <!-- Basic Info -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">活动名称</label>
-                <div class="flex space-x-2">
-                    <input x-model="form.name" required class="flex-1 px-3 py-2 border rounded-lg" placeholder="输入活动名称">
-                    <button type="button" @click="generateCopy()" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap" :disabled="aiLoading">
-                        <span x-show="!aiLoading">🤖 AI生成文案</span>
-                        <span x-show="aiLoading">生成中...</span>
+            <!-- Basic -->
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-ink-secondary mb-2">活动名称</label>
+                <div class="flex gap-2">
+                    <input x-model="form.name" required class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition" placeholder="输入活动名称">
+                    <button type="button" @click="generateCopy()" :disabled="aiLoading" class="px-3 py-2.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold rounded-lg whitespace-nowrap transition disabled:opacity-50 flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span x-show="!aiLoading">AI文案</span><span x-show="aiLoading">生成中...</span>
                     </button>
                 </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">活动描述</label>
-                <textarea x-model="form.description" rows="2" class="w-full px-3 py-2 border rounded-lg" placeholder="活动描述"></textarea>
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-ink-secondary mb-2">活动描述</label>
+                <textarea x-model="form.description" rows="2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition resize-none" placeholder="活动描述"></textarea>
             </div>
 
-            <!-- Type Selection -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">优惠券类型</label>
-                <select x-model="form.type" @change="onTypeChange()" class="w-full px-3 py-2 border rounded-lg">
+            <!-- Type -->
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-ink-secondary mb-2">优惠券类型</label>
+                <select x-model="form.type" @change="onTypeChange()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition">
                     <option value="FULL_REDUCTION">满减券</option>
                     <option value="DISCOUNT">折扣券</option>
                     <option value="NO_THRESHOLD">无门槛券</option>
@@ -36,82 +36,73 @@
             </div>
 
             <!-- Type Params -->
-            <div class="mb-4 bg-gray-50 rounded-lg p-4">
-                <label class="block text-sm font-medium text-gray-600 mb-2">类型参数</label>
+            <div class="mb-5 bg-primary-50/50 rounded-lg p-4 border border-primary-100">
+                <label class="block text-xs font-semibold text-primary-700 mb-3">类型参数</label>
                 <div x-show="form.type==='FULL_REDUCTION'" class="grid grid-cols-2 gap-3">
-                    <div><label class="text-xs text-gray-500">满足金额</label><input x-model.number="form.params.threshold" type="number" class="w-full px-2 py-1 border rounded"></div>
-                    <div><label class="text-xs text-gray-500">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full px-2 py-1 border rounded"></div>
+                    <div><label class="text-[11px] text-ink-muted">满足金额</label><input x-model.number="form.params.threshold" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
+                    <div><label class="text-[11px] text-ink-muted">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
                 </div>
-                <div x-show="form.type==='DISCOUNT'" class="grid grid-cols-1 gap-3">
-                    <div><label class="text-xs text-gray-500">折扣比例 (0.8=8折)</label><input x-model.number="form.params.discount_rate" type="number" step="0.1" class="w-full px-2 py-1 border rounded"></div>
+                <div x-show="form.type==='DISCOUNT'">
+                    <label class="text-[11px] text-ink-muted">折扣比例 (0.8=8折)</label><input x-model.number="form.params.discount_rate" type="number" step="0.1" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
                 </div>
-                <div x-show="form.type==='NO_THRESHOLD'" class="grid grid-cols-1 gap-3">
-                    <div><label class="text-xs text-gray-500">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full px-2 py-1 border rounded"></div>
+                <div x-show="form.type==='NO_THRESHOLD'">
+                    <label class="text-[11px] text-ink-muted">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
                 </div>
                 <div x-show="form.type==='CATEGORY'" class="grid grid-cols-3 gap-3">
-                    <div><label class="text-xs text-gray-500">品类</label><input x-model="form.params.category" class="w-full px-2 py-1 border rounded"></div>
-                    <div><label class="text-xs text-gray-500">满足金额</label><input x-model.number="form.params.threshold" type="number" class="w-full px-2 py-1 border rounded"></div>
-                    <div><label class="text-xs text-gray-500">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full px-2 py-1 border rounded"></div>
+                    <div><label class="text-[11px] text-ink-muted">品类</label><input x-model="form.params.category" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
+                    <div><label class="text-[11px] text-ink-muted">满足金额</label><input x-model.number="form.params.threshold" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
+                    <div><label class="text-[11px] text-ink-muted">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
                 </div>
-                <div x-show="form.type==='NEWCOMER'" class="grid grid-cols-1 gap-3">
-                    <div><label class="text-xs text-gray-500">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full px-2 py-1 border rounded"></div>
+                <div x-show="form.type==='NEWCOMER'">
+                    <label class="text-[11px] text-ink-muted">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
                 </div>
                 <div x-show="form.type==='TIME_LIMITED'" class="grid grid-cols-3 gap-3">
-                    <div><label class="text-xs text-gray-500">开始时间(时)</label><input x-model.number="form.params.start_hour" type="number" class="w-full px-2 py-1 border rounded"></div>
-                    <div><label class="text-xs text-gray-500">结束时间(时)</label><input x-model.number="form.params.end_hour" type="number" class="w-full px-2 py-1 border rounded"></div>
-                    <div><label class="text-xs text-gray-500">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full px-2 py-1 border rounded"></div>
+                    <div><label class="text-[11px] text-ink-muted">开始时间(时)</label><input x-model.number="form.params.start_hour" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
+                    <div><label class="text-[11px] text-ink-muted">结束时间(时)</label><input x-model.number="form.params.end_hour" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
+                    <div><label class="text-[11px] text-ink-muted">减免金额</label><input x-model.number="form.params.discount" type="number" class="w-full mt-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"></div>
                 </div>
             </div>
 
-            <!-- Stock & Limits -->
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">库存数量</label><input x-model.number="form.total_stock" type="number" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">每人限领</label><input x-model.number="form.limit_per_user" type="number" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">有效天数</label><input x-model.number="form.validity_days" type="number" class="w-full px-3 py-2 border rounded-lg"></div>
+            <!-- Stock -->
+            <div class="grid grid-cols-3 gap-4 mb-5">
+                <div><label class="block text-sm font-medium text-ink-secondary mb-2">库存数量</label><input x-model.number="form.total_stock" type="number" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm"></div>
+                <div><label class="block text-sm font-medium text-ink-secondary mb-2">每人限领</label><input x-model.number="form.limit_per_user" type="number" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm"></div>
+                <div><label class="block text-sm font-medium text-ink-secondary mb-2">有效天数</label><input x-model.number="form.validity_days" type="number" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm"></div>
             </div>
 
-            <!-- Advanced Settings -->
-            <div class="mb-6 bg-gray-50 rounded-lg p-4">
-                <label class="block text-sm font-medium text-gray-600 mb-2">高级设置</label>
-                <div class="flex flex-wrap gap-4">
-                    <label class="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" x-model="form.transferable" class="rounded">
-                        <span>可转赠</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" x-model="form.stackable" class="rounded">
-                        <span>可叠加</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" x-model="form.shareable" class="rounded">
-                        <span>可分享</span>
-                    </label>
-                    <div x-show="form.shareable" class="flex items-center space-x-2 text-sm">
-                        <span>分享次数上限:</span>
-                        <input x-model.number="form.share_limit" type="number" class="w-16 px-2 py-1 border rounded">
+            <!-- Advanced -->
+            <div class="mb-5 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <label class="block text-xs font-semibold text-ink-secondary mb-3">高级设置</label>
+                <div class="flex flex-wrap gap-5">
+                    <label class="flex items-center gap-2 text-sm text-ink-secondary cursor-pointer"><input type="checkbox" x-model="form.transferable" class="rounded border-slate-300 text-primary-500 focus:ring-primary-500"><span>可转赠</span></label>
+                    <label class="flex items-center gap-2 text-sm text-ink-secondary cursor-pointer"><input type="checkbox" x-model="form.stackable" class="rounded border-slate-300 text-primary-500 focus:ring-primary-500"><span>可叠加</span></label>
+                    <label class="flex items-center gap-2 text-sm text-ink-secondary cursor-pointer"><input type="checkbox" x-model="form.shareable" class="rounded border-slate-300 text-primary-500 focus:ring-primary-500"><span>可分享</span></label>
+                    <div x-show="form.shareable" class="flex items-center gap-2 text-sm text-ink-secondary">
+                        <span>分享上限:</span><input x-model.number="form.share_limit" type="number" class="w-14 px-2 py-1 border border-slate-200 rounded text-sm">
                     </div>
                 </div>
             </div>
 
-            <!-- AI Copy Preview -->
-            <div x-show="aiError" class="mb-6 bg-red-50 rounded-lg p-4 border border-red-200">
-                <label class="block text-sm font-medium text-red-700 mb-1">❌ AI文案生成失败</label>
-                <p class="text-sm text-red-600" x-text="aiError"></p>
+            <!-- AI Error -->
+            <div x-show="aiError" class="mb-5 bg-red-50 rounded-lg p-4 border border-red-200">
+                <p class="text-xs font-semibold text-red-700 mb-1">AI文案生成失败</p>
+                <p class="text-xs text-red-600" x-text="aiError"></p>
             </div>
-            <div x-show="aiCopy.title" class="mb-6 bg-purple-50 rounded-lg p-4 border border-purple-200">
-                <label class="block text-sm font-medium text-purple-700 mb-2">🤖 AI文案预览</label>
-                <p class="text-sm"><strong>标题：</strong><span x-text="aiCopy.title"></span></p>
-                <p class="text-sm"><strong>描述：</strong><span x-text="aiCopy.description"></span></p>
-                <p class="text-sm"><strong>口号：</strong><span x-text="aiCopy.slogan"></span></p>
-                <button type="button" @click="applyCopy()" class="mt-2 text-xs text-purple-600 hover:underline">应用到表单</button>
+            <!-- AI Preview -->
+            <div x-show="aiCopy.title" class="mb-5 bg-purple-50 rounded-lg p-4 border border-purple-200">
+                <p class="text-xs font-semibold text-purple-700 mb-2">AI文案预览</p>
+                <p class="text-sm text-ink"><strong>标题：</strong><span x-text="aiCopy.title"></span></p>
+                <p class="text-sm text-ink"><strong>描述：</strong><span x-text="aiCopy.description"></span></p>
+                <p class="text-sm text-ink"><strong>口号：</strong><span x-text="aiCopy.slogan"></span></p>
+                <button type="button" @click="applyCopy()" class="mt-2 text-xs text-purple-600 font-medium hover:underline">应用到表单</button>
             </div>
 
-            <div class="flex space-x-3">
-                <button type="submit" :disabled="submitting" class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-medium disabled:opacity-50">
-                    <span x-show="!submitting">创建活动</span>
-                    <span x-show="submitting">创建中...</span>
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button type="submit" :disabled="submitting" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 shadow-sm">
+                    <span x-show="!submitting">创建活动</span><span x-show="submitting">创建中...</span>
                 </button>
-                <a href="/operator/campaigns" class="px-6 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">取消</a>
+                <a href="/operator/campaigns" class="px-5 py-2.5 bg-white border border-slate-200 text-ink-secondary text-sm font-medium rounded-lg hover:bg-slate-50 transition">取消</a>
             </div>
         </form>
     </div>
@@ -121,54 +112,23 @@
 <script>
 function createCampaign() {
     return {
-        form: {
-            name: '', description: '', type: 'FULL_REDUCTION',
-            params: {threshold: 100, discount: 20},
-            total_stock: 100, limit_per_user: 1, validity_days: 1,
-            validity_mode: 'RELATIVE',
-            transferable: false, stackable: false, shareable: false, share_limit: 3,
-        },
-        aiCopy: {}, aiLoading: false, aiError: '', submitting: false,
+        form: { name:'',description:'',type:'FULL_REDUCTION',params:{threshold:100,discount:20},total_stock:100,limit_per_user:1,validity_days:1,validity_mode:'RELATIVE',transferable:false,stackable:false,shareable:false,share_limit:3 },
+        aiCopy:{}, aiLoading:false, aiError:'', submitting:false,
         init() {},
-        async onTypeChange() {
-            const r = await fetch('/api/campaigns/defaults/' + this.form.type);
-            const d = await r.json();
-            if (d.success) this.form.params = d.data;
-        },
+        async onTypeChange() { const r=await fetch('/api/campaigns/defaults/'+this.form.type); const d=await r.json(); if(d.success) this.form.params=d.data; },
         async generateCopy() {
-            this.aiLoading = true;
-            this.aiCopy = {};
-            this.aiError = '';
-            const r = await fetch('/api/ai/generate-copy', {
-                method: 'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({type: this.form.type, params: this.form.params, context: this.form.name})
-            });
-            const d = await r.json();
-            if (d.success && d.data.source !== 'error') {
-                this.aiCopy = d.data;
-            } else {
-                this.aiError = (d.data && d.data.error) || 'AI调用失败，请检查Bedrock配置';
-            }
-            this.aiLoading = false;
+            this.aiLoading=true; this.aiCopy={}; this.aiError='';
+            const r=await fetch('/api/ai/generate-copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:this.form.type,params:this.form.params,context:this.form.name})});
+            const d=await r.json();
+            if(d.success && d.data.source!=='error') { this.aiCopy=d.data; } else { this.aiError=(d.data&&d.data.error)||'AI调用失败'; }
+            this.aiLoading=false;
         },
-        applyCopy() {
-            if (this.aiCopy.title) this.form.name = this.aiCopy.title;
-            if (this.aiCopy.description) this.form.description = this.aiCopy.description;
-        },
+        applyCopy() { if(this.aiCopy.title) this.form.name=this.aiCopy.title; if(this.aiCopy.description) this.form.description=this.aiCopy.description; },
         async submit() {
-            this.submitting = true;
-            const r = await fetch('/api/campaigns', {
-                method: 'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify(this.form)
-            });
-            const d = await r.json();
-            this.submitting = false;
-            if (d.success) {
-                alert('创建成功！');
-                window.location.href = '/operator/campaigns';
-            } else {
-                alert(d.error.message);
-            }
+            this.submitting=true;
+            const r=await fetch('/api/campaigns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.form)});
+            const d=await r.json(); this.submitting=false;
+            if(d.success) { alert('创建成功！'); window.location.href='/operator/campaigns'; } else { alert(d.error.message); }
         }
     }
 }

@@ -1,54 +1,53 @@
 {% extends "base.html" %}
 {% block title %}统计面板 - 优惠券中心{% endblock %}
+{% block page_title %}数据统计{% endblock %}
 {% block content %}
 <div x-data="dashboard()" x-init="init()">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">数据统计</h1>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
-            <p class="text-3xl font-bold text-primary" x-text="stats.total_campaigns"></p>
-            <p class="text-sm text-gray-500">活动数</p>
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center"><i data-lucide="layout-grid" class="w-3.5 h-3.5 text-primary-600"></i></div><span class="text-[11px] text-ink-muted">活动数</span></div>
+            <p class="text-2xl font-bold text-ink" x-text="stats.total_campaigns"></p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
-            <p class="text-3xl font-bold text-green-500" x-text="stats.total_coupons"></p>
-            <p class="text-sm text-gray-500">已发券</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i data-lucide="ticket" class="w-3.5 h-3.5 text-emerald-600"></i></div><span class="text-[11px] text-ink-muted">已发券</span></div>
+            <p class="text-2xl font-bold text-ink" x-text="stats.total_coupons"></p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
-            <p class="text-3xl font-bold text-purple-500" x-text="stats.total_redeemed"></p>
-            <p class="text-sm text-gray-500">已核销</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center"><i data-lucide="check-square" class="w-3.5 h-3.5 text-purple-600"></i></div><span class="text-[11px] text-ink-muted">已核销</span></div>
+            <p class="text-2xl font-bold text-ink" x-text="stats.total_redeemed"></p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
-            <p class="text-3xl font-bold text-blue-500" x-text="stats.total_users"></p>
-            <p class="text-sm text-gray-500">用户数</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center"><i data-lucide="users" class="w-3.5 h-3.5 text-sky-600"></i></div><span class="text-[11px] text-ink-muted">用户数</span></div>
+            <p class="text-2xl font-bold text-ink" x-text="stats.total_users"></p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
-            <p class="text-3xl font-bold text-red-500" x-text="stats.risk_blocks"></p>
-            <p class="text-sm text-gray-500">风控拦截</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center"><i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-500"></i></div><span class="text-[11px] text-ink-muted">风控拦截</span></div>
+            <p class="text-2xl font-bold text-ink" x-text="stats.risk_blocks"></p>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm border p-4">
-            <h3 class="font-semibold text-gray-700 mb-3">近7日领券趋势</h3>
-            <canvas id="dailyChart" height="200"></canvas>
+    <!-- Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <h3 class="text-sm font-semibold text-ink mb-4">近7日领券趋势</h3>
+            <canvas id="dailyChart" height="180"></canvas>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border p-4">
-            <h3 class="font-semibold text-gray-700 mb-3">优惠券类型分布</h3>
-            <canvas id="typeChart" height="200"></canvas>
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <h3 class="text-sm font-semibold text-ink mb-4">优惠券类型分布</h3>
+            <canvas id="typeChart" height="180"></canvas>
         </div>
     </div>
 
     <!-- Rates -->
-    <div class="grid grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <p class="text-5xl font-bold text-primary" x-text="(stats.claim_rate * 100).toFixed(0) + '%'"></p>
-            <p class="text-gray-500 mt-2">领取率</p>
+    <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+            <p class="text-4xl font-bold text-primary-600" x-text="(stats.claim_rate*100).toFixed(0)+'%'"></p>
+            <p class="text-xs text-ink-muted mt-1">领取率</p>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <p class="text-5xl font-bold text-green-500" x-text="(stats.redeem_rate * 100).toFixed(0) + '%'"></p>
-            <p class="text-gray-500 mt-2">核销率</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 text-center">
+            <p class="text-4xl font-bold text-emerald-600" x-text="(stats.redeem_rate*100).toFixed(0)+'%'"></p>
+            <p class="text-xs text-ink-muted mt-1">核销率</p>
         </div>
     </div>
 </div>
@@ -59,39 +58,14 @@ function dashboard() {
     return {
         stats: {total_campaigns:0,total_coupons:0,total_redeemed:0,total_users:0,risk_blocks:0,claim_rate:0,redeem_rate:0,daily_claims:[],type_distribution:[]},
         async init() {
-            const r = await fetch('/api/stats/overview');
-            const d = await r.json();
-            if (d.success) {
-                this.stats = d.data;
-                this.$nextTick(() => { this.renderCharts(); });
-            }
+            const r=await fetch('/api/stats/overview'); const d=await r.json();
+            if(d.success) { this.stats=d.data; this.$nextTick(()=>this.renderCharts()); }
         },
         renderCharts() {
-            // Daily claims chart
-            const dailyCtx = document.getElementById('dailyChart');
-            if (dailyCtx) {
-                new Chart(dailyCtx, {
-                    type: 'line',
-                    data: {
-                        labels: this.stats.daily_claims.map(d => d.date.substring(5)),
-                        datasets: [{label: '领券数', data: this.stats.daily_claims.map(d => d.count), borderColor: '#3b82f6', tension: 0.3, fill: true, backgroundColor: 'rgba(59,130,246,0.1)'}]
-                    },
-                    options: {responsive: true, plugins: {legend: {display: false}}}
-                });
-            }
-            // Type distribution chart
-            const typeCtx = document.getElementById('typeChart');
-            if (typeCtx) {
-                const typeNames = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
-                new Chart(typeCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: this.stats.type_distribution.map(d => typeNames[d.type]||d.type),
-                        datasets: [{data: this.stats.type_distribution.map(d => d.count), backgroundColor: ['#ef4444','#8b5cf6','#10b981','#f97316','#3b82f6','#ec4899','#eab308']}]
-                    },
-                    options: {responsive: true}
-                });
-            }
+            const dc=document.getElementById('dailyChart');
+            if(dc) new Chart(dc,{type:'line',data:{labels:this.stats.daily_claims.map(d=>d.date.substring(5)),datasets:[{label:'领券数',data:this.stats.daily_claims.map(d=>d.count),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3b82f6'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}}});
+            const tc=document.getElementById('typeChart');
+            if(tc){const tn={FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};new Chart(tc,{type:'doughnut',data:{labels:this.stats.type_distribution.map(d=>tn[d.type]||d.type),datasets:[{data:this.stats.type_distribution.map(d=>d.count),backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f97316','#06b6d4','#ec4899','#eab308'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12,font:{size:11}}}}}});}
         }
     }
 }

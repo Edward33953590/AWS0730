@@ -1,94 +1,63 @@
 {% extends "base.html" %}
 {% block title %}登录 - 优惠券中心{% endblock %}
-{% block content %}
-<div class="min-h-[80vh] flex items-center justify-center">
-    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">优惠券中心</h1>
-        <h2 class="text-lg text-center text-gray-600 mb-6">登录</h2>
-        <div x-data="{ loading: false }" id="login-form">
-            <form @submit.prevent="
-                loading = true;
-                const formData = new FormData($el);
-                fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        username: formData.get('username'),
-                        password: formData.get('password')
-                    })
-                })
-                .then(r => r.json())
-                .then(d => {
-                    loading = false;
-                    if (d.success) {
-                        window.location.href = d.data.redirect;
-                    } else {
-                        alert(d.error.message);
-                    }
-                })
-                .catch(() => { loading = false; alert('网络错误'); });
-            ">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
-                    <input type="text" name="username" id="login-username" required minlength="3" maxlength="20"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="请输入用户名">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
-                    <input type="password" name="password" id="login-password" required minlength="6" maxlength="50"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                        placeholder="请输入密码">
-                </div>
-                <button type="submit" :disabled="loading"
-                    class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg font-medium transition disabled:opacity-50">
-                    <span x-show="!loading">登录</span>
-                    <span x-show="loading">登录中...</span>
-                </button>
-            </form>
+{% block auth_content %}
+<div class="min-h-screen flex">
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 flex-col justify-between p-12 text-white">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 40%);"></div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-16">
+                <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center font-bold text-lg">券</div>
+                <span class="text-xl font-bold">优惠券中心</span>
+            </div>
+            <h2 class="text-4xl font-bold leading-tight mb-4">智能优惠券<br/><span class="text-primary-200">发放与核销平台</span></h2>
+            <p class="text-primary-100 text-base leading-relaxed max-w-md">AI驱动的优惠券管理系统，支持多种券类型、智能推荐、风控检测和实时数据分析。</p>
+            <div class="flex gap-8 mt-10">
+                <div><div class="text-2xl font-bold">7+</div><div class="text-xs text-primary-200">优惠券类型</div></div>
+                <div><div class="text-2xl font-bold">AI</div><div class="text-xs text-primary-200">智能推荐</div></div>
+                <div><div class="text-2xl font-bold">实时</div><div class="text-xs text-primary-200">风控检测</div></div>
+            </div>
         </div>
-        <p class="text-center text-sm text-gray-500 mt-4">
-            没有账号？<a href="/register" class="text-primary hover:underline">去注册</a>
-        </p>
-
-        <!-- Demo Quick Login -->
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <p class="text-center text-xs text-gray-400 mb-3">演示模式 - 快速登录</p>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="demoLogin('admin','admin123')" class="px-3 py-2 text-xs bg-red-50 hover:bg-red-100 text-red-700 rounded-lg border border-red-200 transition">
-                    管理员
-                </button>
-                <button onclick="demoLogin('operator','operator123')" class="px-3 py-2 text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-lg border border-orange-200 transition">
-                    运营人员
-                </button>
-                <button onclick="demoLogin('verifier','verifier123')" class="px-3 py-2 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200 transition">
-                    核销人员
-                </button>
-                <button onclick="demoLogin('user1','user123')" class="px-3 py-2 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition">
-                    普通用户
-                </button>
+        <div class="relative z-10 text-xs text-primary-300">SRCG Workshop 2026</div>
+    </div>
+    <div class="flex-1 flex items-center justify-center p-8 bg-slate-50">
+        <div class="w-full max-w-md">
+            <div class="lg:hidden flex items-center gap-3 mb-8">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm">券</div>
+                <span class="text-lg font-bold text-slate-800">优惠券中心</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 mb-1">欢迎回来</h1>
+            <p class="text-slate-500 text-sm mb-8">输入您的账号信息登录系统</p>
+            <div x-data="{ loading: false }">
+                <form @submit.prevent="loading=true; fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$el.querySelector('[name=username]').value,password:$el.querySelector('[name=password]').value})}).then(r=>r.json()).then(d=>{loading=false;if(d.success){window.location.href=d.data.redirect}else{alert(d.error.message)}}).catch(()=>{loading=false;alert('网络错误')})">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">用户名</label>
+                        <input type="text" name="username" id="login-username" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" placeholder="请输入用户名">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">密码</label>
+                        <input type="password" name="password" id="login-password" required class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" placeholder="请输入密码">
+                    </div>
+                    <button type="submit" :disabled="loading" class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition disabled:opacity-50">
+                        <span x-show="!loading">登 录</span><span x-show="loading">登录中...</span>
+                    </button>
+                </form>
+            </div>
+            <p class="text-center text-sm text-slate-500 mt-6">没有账号？<a href="/register" class="text-blue-600 font-semibold hover:underline">去注册</a></p>
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <p class="text-center text-xs text-slate-400 mb-3">演示模式 - 快速登录</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="demoLogin('admin','admin123')" class="px-3 py-2.5 text-xs font-medium bg-white hover:bg-red-50 text-red-600 rounded-lg border border-slate-200 hover:border-red-200 transition">管理员</button>
+                    <button onclick="demoLogin('operator','operator123')" class="px-3 py-2.5 text-xs font-medium bg-white hover:bg-orange-50 text-orange-600 rounded-lg border border-slate-200 hover:border-orange-200 transition">运营人员</button>
+                    <button onclick="demoLogin('verifier','verifier123')" class="px-3 py-2.5 text-xs font-medium bg-white hover:bg-purple-50 text-purple-600 rounded-lg border border-slate-200 hover:border-purple-200 transition">核销人员</button>
+                    <button onclick="demoLogin('user1','user123')" class="px-3 py-2.5 text-xs font-medium bg-white hover:bg-blue-50 text-blue-600 rounded-lg border border-slate-200 hover:border-blue-200 transition">普通用户</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
-function demoLogin(username, password) {
-    document.getElementById('login-username').value = username;
-    document.getElementById('login-password').value = password;
-    fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, password})
-    })
-    .then(r => r.json())
-    .then(d => {
-        if (d.success) window.location.href = d.data.redirect;
-        else alert(d.error.message);
-    })
-    .catch(() => alert('网络错误'));
-}
+function demoLogin(u,p){document.getElementById('login-username').value=u;document.getElementById('login-password').value=p;fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}).then(r=>r.json()).then(d=>{if(d.success)window.location.href=d.data.redirect;else alert(d.error.message)}).catch(()=>alert('网络错误'));}
 </script>
 {% endblock %}

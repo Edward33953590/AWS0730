@@ -1,28 +1,30 @@
 {% extends "base.html" %}
 {% block title %}操作日志 - 优惠券中心{% endblock %}
+{% block page_title %}操作日志{% endblock %}
 {% block content %}
 <div x-data="logsPage()" x-init="init()">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">操作日志</h1>
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <table class="w-full">
-            <thead class="bg-gray-50"><tr>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">时间</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">操作</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">目标</th>
-                <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">详情</th>
-            </tr></thead>
-            <tbody class="divide-y">
+            <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">时间</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">操作</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">目标</th>
+                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-ink-muted uppercase tracking-wider">详情</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
                 <template x-for="l in logs" :key="l.id">
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm" x-text="l.created_at.substring(0,16)"></td>
-                        <td class="px-4 py-3 text-sm font-medium" x-text="l.action"></td>
-                        <td class="px-4 py-3 text-sm font-mono" x-text="l.target"></td>
-                        <td class="px-4 py-3 text-sm text-gray-500" x-text="l.detail ? l.detail.substring(0,50) : ''"></td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 text-xs text-ink-secondary" x-text="l.created_at.substring(0,16)"></td>
+                        <td class="px-4 py-3"><span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-50 text-primary-600" x-text="l.action"></span></td>
+                        <td class="px-4 py-3 text-xs font-mono text-ink" x-text="l.target"></td>
+                        <td class="px-4 py-3 text-xs text-ink-muted truncate max-w-[200px]" x-text="l.detail ? l.detail.substring(0,60) : ''"></td>
                     </tr>
                 </template>
             </tbody>
         </table>
-        <div x-show="logs.length === 0" class="text-center py-8 text-gray-400">暂无日志</div>
+        <div x-show="logs.length===0" class="text-center py-12 text-ink-muted text-sm">暂无日志</div>
     </div>
 </div>
 {% endblock %}
@@ -31,11 +33,7 @@
 function logsPage() {
     return {
         logs: [],
-        async init() {
-            const r = await fetch('/api/logs');
-            const d = await r.json();
-            if (d.success) this.logs = d.data.items;
-        }
+        async init() { const r=await fetch('/api/logs'); const d=await r.json(); if(d.success) this.logs=d.data.items; }
     }
 }
 </script>

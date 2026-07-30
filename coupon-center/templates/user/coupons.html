@@ -1,79 +1,56 @@
 {% extends "base.html" %}
 {% block title %}我的券包 - 优惠券中心{% endblock %}
+{% block page_title %}我的券包{% endblock %}
 {% block content %}
 <div x-data="couponPage()" x-init="init()">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">我的券包</h1>
-
     <!-- Status Filter -->
-    <div class="flex space-x-2 mb-6">
-        <button @click="filter=''" :class="filter==='' ? 'bg-primary text-white' : 'bg-white text-gray-600'" class="px-4 py-1.5 rounded-full text-sm border transition">全部</button>
-        <button @click="filter='CLAIMED'" :class="filter==='CLAIMED' ? 'bg-primary text-white' : 'bg-white text-gray-600'" class="px-4 py-1.5 rounded-full text-sm border transition">待使用</button>
-        <button @click="filter='REDEEMED'" :class="filter==='REDEEMED' ? 'bg-primary text-white' : 'bg-white text-gray-600'" class="px-4 py-1.5 rounded-full text-sm border transition">已核销</button>
-        <button @click="filter='EXPIRED'" :class="filter==='EXPIRED' ? 'bg-primary text-white' : 'bg-white text-gray-600'" class="px-4 py-1.5 rounded-full text-sm border transition">已过期</button>
+    <div class="flex gap-2 mb-5">
+        <button @click="filter=''; loadCoupons()" :class="filter==='' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">全部</button>
+        <button @click="filter='CLAIMED'; loadCoupons()" :class="filter==='CLAIMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">待使用</button>
+        <button @click="filter='REDEEMED'; loadCoupons()" :class="filter==='REDEEMED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已核销</button>
+        <button @click="filter='EXPIRED'; loadCoupons()" :class="filter==='EXPIRED' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">已过期</button>
     </div>
 
     <!-- Coupon List -->
     <div class="space-y-3">
         <template x-for="c in filteredCoupons" :key="c.id">
-            <div class="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between"
-                :class="c.status !== 'CLAIMED' ? 'opacity-60' : ''">
-                <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-1">
-                        <span class="text-xs px-2 py-0.5 rounded" :class="statusColor(c.status)" x-text="statusLabel(c.status)"></span>
-                        <span class="text-xs text-gray-400" x-text="typeLabel(c.campaign_type)"></span>
+            <div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between hover:shadow-sm transition" :class="c.status !== 'CLAIMED' ? 'opacity-60' : ''">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" :class="statusColor(c.status)" x-text="statusLabel(c.status)"></span>
+                        <span class="text-[11px] text-ink-muted" x-text="typeLabel(c.campaign_type)"></span>
                     </div>
-                    <h3 class="font-semibold text-gray-800" x-text="c.campaign_name"></h3>
-                    <div class="text-xs text-gray-500 mt-1">
-                        <span x-text="'券码: ' + c.coupon_code"></span> ·
-                        <span x-text="'有效期至: ' + formatDate(c.expires_at)"></span>
+                    <h3 class="font-semibold text-ink text-sm" x-text="c.campaign_name"></h3>
+                    <div class="flex items-center gap-3 text-[11px] text-ink-muted mt-1">
+                        <span class="font-mono" x-text="c.coupon_code"></span>
+                        <span x-text="'有效期至 ' + formatDate(c.expires_at)"></span>
                     </div>
                 </div>
-                <div class="ml-4" x-show="c.status === 'CLAIMED'">
-                    <button @click="showCode(c.coupon_code)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-sm">
+                <div class="ml-4 flex-shrink-0" x-show="c.status === 'CLAIMED'">
+                    <button @click="showCode(c.coupon_code)" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition">
                         出示券码
                     </button>
                 </div>
             </div>
         </template>
     </div>
-
-    <div x-show="filteredCoupons.length === 0" class="text-center py-12 text-gray-400">
-        暂无优惠券
+    <div x-show="filteredCoupons.length === 0" class="text-center py-16 text-ink-muted text-sm">
+        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>暂无优惠券
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 function couponPage() {
     return {
-        coupons: [],
-        filter: '',
+        coupons: [], filter: '',
         init() { this.loadCoupons(); },
-        get filteredCoupons() {
-            if (!this.filter) return this.coupons;
-            return this.coupons.filter(c => c.status === this.filter);
-        },
-        async loadCoupons() {
-            const r = await fetch('/api/coupons/my');
-            const d = await r.json();
-            if (d.success) this.coupons = d.data.items;
-        },
-        showCode(code) {
-            alert('请向核销人员出示券码:\n\n' + code);
-        },
-        statusLabel(s) {
-            const m = {CLAIMED:'待使用',REDEEMED:'已核销',EXPIRED:'已过期',TRANSFERRED:'已转赠'};
-            return m[s]||s;
-        },
-        statusColor(s) {
-            const m = {CLAIMED:'bg-green-100 text-green-700',REDEEMED:'bg-gray-100 text-gray-600',EXPIRED:'bg-red-100 text-red-600',TRANSFERRED:'bg-blue-100 text-blue-600'};
-            return m[s]||'bg-gray-100';
-        },
-        typeLabel(t) {
-            const m = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
-            return m[t]||t;
-        },
+        get filteredCoupons() { if (!this.filter) return this.coupons; return this.coupons.filter(c => c.status === this.filter); },
+        async loadCoupons() { const r = await fetch('/api/coupons/my'); const d = await r.json(); if (d.success) this.coupons = d.data.items; },
+        showCode(code) { alert('请向核销人员出示券码:\n\n' + code); },
+        statusLabel(s) { return {CLAIMED:'待使用',REDEEMED:'已核销',EXPIRED:'已过期',TRANSFERRED:'已转赠'}[s]||s; },
+        statusColor(s) { return {CLAIMED:'bg-emerald-50 text-emerald-700',REDEEMED:'bg-slate-100 text-slate-500',EXPIRED:'bg-red-50 text-red-600',TRANSFERRED:'bg-primary-50 text-primary-600'}[s]||'bg-slate-100'; },
+        typeLabel(t) { return {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'}[t]||t; },
         formatDate(d) { return d ? d.substring(0,10) : ''; }
     }
 }

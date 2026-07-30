@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 {% block title %}通知 - 优惠券中心{% endblock %}
+{% block page_title %}消息通知{% endblock %}
 {% block content %}
 <div x-data="notifPage()" x-init="init()">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">消息通知</h1>
-        <button @click="markAllRead()" class="text-sm text-primary hover:underline">全部已读</button>
+    <div class="flex justify-end mb-4">
+        <button @click="markAllRead()" class="text-xs text-primary-600 font-medium hover:underline">全部已读</button>
     </div>
     <div class="space-y-2">
         <template x-for="n in notifications" :key="n.id">
-            <div class="bg-white rounded-lg border p-4" :class="n.read ? 'opacity-60' : 'border-l-4 border-l-primary'">
-                <div class="flex justify-between">
-                    <p class="text-gray-800" x-text="n.content"></p>
-                    <span class="text-xs text-gray-400" x-text="n.created_at.substring(0,16)"></span>
+            <div class="bg-white rounded-xl border p-4 transition"
+                :class="n.read ? 'border-slate-200 opacity-60' : 'border-l-4 border-l-primary-500 border-slate-200'">
+                <div class="flex justify-between items-start">
+                    <p class="text-sm text-ink" x-text="n.content"></p>
+                    <span class="text-[11px] text-ink-muted flex-shrink-0 ml-4" x-text="n.created_at ? n.created_at.substring(0,16) : ''"></span>
                 </div>
             </div>
         </template>
     </div>
-    <div x-show="notifications.length === 0" class="text-center py-12 text-gray-400">暂无通知</div>
+    <div x-show="notifications.length===0" class="text-center py-16 text-ink-muted text-sm">
+        <i data-lucide="bell-off" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>暂无通知
+    </div>
 </div>
 {% endblock %}
 {% block scripts %}
@@ -27,7 +30,7 @@ function notifPage() {
         async init() {
             const r = await fetch('/api/notifications');
             const d = await r.json();
-            if (d.success) this.notifications = d.data.items || d.data || [];
+            if (d.success) this.notifications = d.data.items || [];
         },
         async markAllRead() {
             await fetch('/api/notifications/read-all', {method:'PUT'});

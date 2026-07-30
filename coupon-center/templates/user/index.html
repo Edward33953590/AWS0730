@@ -1,58 +1,61 @@
 {% extends "base.html" %}
 {% block title %}首页 - 优惠券中心{% endblock %}
+{% block page_title %}首页{% endblock %}
 {% block content %}
 <div x-data="userHome()" x-init="init()">
     <!-- AI Recommendations -->
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800">
-                <i data-lucide="sparkles" class="w-5 h-5 inline text-yellow-500"></i>
-                为你推荐
-            </h2>
-            <button @click="loadRecommendations()" class="text-sm text-primary hover:underline">
-                <i data-lucide="refresh-cw" class="w-4 h-4 inline"></i> 刷新推荐
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i></div>
+                <h2 class="text-base font-bold text-ink">AI 为你推荐</h2>
+            </div>
+            <button @click="loadRecommendations()" class="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 transition">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 刷新
             </button>
         </div>
-        <div x-show="recLoading" class="flex justify-center py-8">
-            <div class="animate-pulse text-gray-400">AI 正在分析您的偏好...</div>
+        <div x-show="recLoading" class="flex justify-center py-10">
+            <div class="flex items-center gap-2 text-sm text-ink-muted"><div class="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>AI 正在分析您的偏好...</div>
         </div>
-        <div x-show="!recLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div x-show="!recLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <template x-for="rec in recommendations" :key="rec.campaign_id">
-                <div class="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md hover:border-primary-200 transition group">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded" x-text="typeLabel(rec.campaign_type)"></span>
-                        <span class="text-xs text-gray-400" x-text="'剩余' + rec.remaining_stock + '张'"></span>
+                        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-50 text-primary-700" x-text="typeLabel(rec.campaign_type)"></span>
+                        <span class="text-[11px] text-ink-muted" x-text="'剩余' + rec.remaining_stock + '张'"></span>
                     </div>
-                    <h3 class="font-semibold text-gray-800 mb-1" x-text="rec.campaign_name"></h3>
-                    <p class="text-sm text-green-600 mb-3" x-text="'💡 ' + rec.reason"></p>
-                    <button @click="claimCoupon(rec.campaign_id)" class="w-full bg-primary hover:bg-primary-dark text-white py-1.5 rounded text-sm transition">
+                    <h3 class="font-semibold text-ink text-sm mb-2" x-text="rec.campaign_name"></h3>
+                    <p class="text-xs text-emerald-600 bg-emerald-50 rounded-lg px-2.5 py-1.5 mb-3 leading-relaxed"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1"></i><span x-text="rec.reason"></span></p>
+                    <button @click="claimCoupon(rec.campaign_id)" class="w-full py-2 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg transition">
                         立即领取
                     </button>
                 </div>
             </template>
         </div>
-        <div x-show="!recLoading && recommendations.length === 0" class="text-center py-8 text-gray-400">
-            暂无推荐，试试浏览所有优惠券
+        <div x-show="!recLoading && recommendations.length === 0" class="text-center py-10 text-ink-muted text-sm">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+            <p>暂无推荐，去<a href="/user/explore" class="text-primary-600 font-medium">浏览所有优惠券</a></p>
         </div>
     </div>
 
     <!-- Quick Links -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <a href="/user/explore" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
-            <i data-lucide="ticket" class="w-8 h-8 mx-auto text-primary mb-2"></i>
-            <span class="text-sm text-gray-700">浏览领券</span>
+    <h2 class="text-base font-bold text-ink mb-3">快捷入口</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="/user/explore" class="bg-white rounded-xl border border-slate-200 p-4 text-center hover:shadow-md hover:border-primary-200 transition group">
+            <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-primary-50 flex items-center justify-center group-hover:bg-primary-100 transition"><i data-lucide="ticket" class="w-5 h-5 text-primary-600"></i></div>
+            <span class="text-xs font-medium text-ink-secondary">浏览领券</span>
         </a>
-        <a href="/user/coupons" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
-            <i data-lucide="wallet" class="w-8 h-8 mx-auto text-green-500 mb-2"></i>
-            <span class="text-sm text-gray-700">我的券包</span>
+        <a href="/user/coupons" class="bg-white rounded-xl border border-slate-200 p-4 text-center hover:shadow-md hover:border-primary-200 transition group">
+            <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition"><i data-lucide="wallet" class="w-5 h-5 text-emerald-600"></i></div>
+            <span class="text-xs font-medium text-ink-secondary">我的券包</span>
         </a>
-        <a href="/user/favorites" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
-            <i data-lucide="heart" class="w-8 h-8 mx-auto text-red-400 mb-2"></i>
-            <span class="text-sm text-gray-700">收藏夹</span>
+        <a href="/user/favorites" class="bg-white rounded-xl border border-slate-200 p-4 text-center hover:shadow-md hover:border-primary-200 transition group">
+            <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-rose-50 flex items-center justify-center group-hover:bg-rose-100 transition"><i data-lucide="heart" class="w-5 h-5 text-rose-500"></i></div>
+            <span class="text-xs font-medium text-ink-secondary">收藏夹</span>
         </a>
-        <a href="/user/ranking" class="bg-white rounded-lg p-4 text-center shadow-sm border hover:shadow-md transition">
-            <i data-lucide="trophy" class="w-8 h-8 mx-auto text-yellow-500 mb-2"></i>
-            <span class="text-sm text-gray-700">排行榜</span>
+        <a href="/user/ranking" class="bg-white rounded-xl border border-slate-200 p-4 text-center hover:shadow-md hover:border-primary-200 transition group">
+            <div class="w-10 h-10 mx-auto mb-2 rounded-lg bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition"><i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i></div>
+            <span class="text-xs font-medium text-ink-secondary">排行榜</span>
         </a>
     </div>
 </div>
@@ -62,38 +65,19 @@
 <script>
 function userHome() {
     return {
-        recommendations: [],
-        recLoading: false,
-        init() {
-            this.loadRecommendations();
-        },
+        recommendations: [], recLoading: false,
+        init() { this.loadRecommendations(); },
         async loadRecommendations() {
             this.recLoading = true;
-            try {
-                const r = await fetch('/api/ai/recommend', {method: 'POST'});
-                const d = await r.json();
-                if (d.success) this.recommendations = d.data.recommendations;
-            } catch(e) {}
+            try { const r = await fetch('/api/ai/recommend', {method:'POST'}); const d = await r.json(); if (d.success) this.recommendations = d.data.recommendations; } catch(e) {}
             this.recLoading = false;
         },
         async claimCoupon(campaignId) {
-            const r = await fetch('/api/coupons/claim', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({campaign_id: campaignId})
-            });
+            const r = await fetch('/api/coupons/claim', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({campaign_id:campaignId}) });
             const d = await r.json();
-            if (d.success) {
-                alert('领取成功！券码: ' + d.data.coupon_code);
-                this.loadRecommendations();
-            } else {
-                alert(d.error.message);
-            }
+            if (d.success) { alert('领取成功！券码: ' + d.data.coupon_code); this.loadRecommendations(); } else { alert(d.error.message); }
         },
-        typeLabel(type) {
-            const map = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
-            return map[type] || type;
-        }
+        typeLabel(type) { return {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'}[type]||type; }
     }
 }
 </script>

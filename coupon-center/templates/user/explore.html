@@ -1,142 +1,79 @@
 {% extends "base.html" %}
 {% block title %}浏览优惠券 - 优惠券中心{% endblock %}
+{% block page_title %}浏览优惠券{% endblock %}
 {% block content %}
 <div x-data="explorePage()" x-init="init()">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">浏览优惠券</h1>
-        <div class="flex space-x-2">
-            <select x-model="filterType" @change="loadCampaigns()" class="text-sm border rounded-lg px-3 py-1.5">
-                <option value="">全部类型</option>
-                <option value="FULL_REDUCTION">满减</option>
-                <option value="DISCOUNT">折扣</option>
-                <option value="NO_THRESHOLD">无门槛</option>
-                <option value="ADD_ON">加购</option>
-                <option value="CATEGORY">品类</option>
-                <option value="NEWCOMER">新人</option>
-                <option value="TIME_LIMITED">限时</option>
-            </select>
-        </div>
+    <!-- Filters -->
+    <div class="flex items-center gap-2 mb-5 flex-wrap">
+        <button @click="filterType=''; loadCampaigns()" :class="filterType==='' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200 hover:border-primary-300'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition">全部</button>
+        <template x-for="t in types" :key="t.value">
+            <button @click="filterType=t.value; loadCampaigns()" :class="filterType===t.value ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-ink-secondary border-slate-200 hover:border-primary-300'" class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition" x-text="t.label"></button>
+        </template>
     </div>
 
-    <!-- Campaigns Grid -->
+    <!-- Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <template x-for="c in campaigns" :key="c.id">
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md hover:border-primary-200 transition">
                 <div class="p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium px-2 py-0.5 rounded" 
-                            :class="typeColor(c.type)" x-text="typeLabel(c.type)"></span>
-                        <span class="text-xs text-gray-400" x-text="c.transferable ? '可转赠' : ''"></span>
+                        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" :class="typeColor(c.type)" x-text="typeLabel(c.type)"></span>
+                        <span class="text-[11px] text-ink-muted" x-show="c.transferable">可转赠</span>
                     </div>
-                    <h3 class="font-bold text-gray-800 text-lg mb-1" x-text="c.name"></h3>
-                    <p class="text-sm text-gray-500 mb-3" x-text="c.description || paramText(c)"></p>
-                    
+                    <h3 class="font-bold text-ink text-sm mb-1" x-text="c.name"></h3>
+                    <p class="text-xs text-ink-muted mb-3" x-text="c.description || paramText(c)"></p>
                     <!-- Progress bar -->
                     <div class="mb-3">
-                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <div class="flex justify-between text-[11px] text-ink-muted mb-1">
                             <span x-text="'已领 ' + (c.total_stock - c.remaining_stock) + '/' + c.total_stock"></span>
                             <span x-text="c.claim_percentage + '%'"></span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-primary rounded-full h-2 transition-all" 
-                                :style="'width:' + c.claim_percentage + '%'"
-                                :class="c.claim_percentage > 80 ? 'bg-red-500' : ''"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5">
+                            <div class="rounded-full h-1.5 transition-all" :style="'width:'+c.claim_percentage+'%'" :class="c.claim_percentage > 80 ? 'bg-red-400' : 'bg-primary-500'"></div>
                         </div>
                     </div>
-
                     <!-- Actions -->
-                    <div class="flex space-x-2">
-                        <button @click="claimCoupon(c.id)" 
-                            :disabled="!c.is_active"
-                            class="flex-1 bg-primary hover:bg-primary-dark text-white py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <div class="flex gap-2">
+                        <button @click="claimCoupon(c.id)" :disabled="!c.is_active"
+                            class="flex-1 py-2 text-xs font-semibold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            :class="c.is_active ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'bg-slate-100 text-slate-400'">
                             <span x-text="c.is_active ? '领取' : '已抢完'"></span>
                         </button>
-                        <button @click="toggleFavorite(c.id)" 
-                            class="px-3 py-2 border rounded-lg hover:bg-red-50 transition"
-                            :class="isFavorited(c.id) ? 'text-red-500 border-red-200' : 'text-gray-400'">
-                            ♥
+                        <button @click="toggleFavorite(c.id)" class="w-9 h-9 border rounded-lg flex items-center justify-center transition" :class="isFavorited(c.id) ? 'border-rose-200 bg-rose-50 text-rose-500' : 'border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-200'">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </template>
     </div>
-
-    <div x-show="campaigns.length === 0 && !loading" class="text-center py-12 text-gray-400">
-        暂无可用优惠券活动
+    <div x-show="campaigns.length===0 && !loading" class="text-center py-16 text-ink-muted text-sm">
+        <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-slate-300"></i>暂无可用优惠券活动
     </div>
-    <div x-show="loading" class="text-center py-12 text-gray-400">加载中...</div>
+    <div x-show="loading" class="text-center py-16"><div class="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 function explorePage() {
     return {
-        campaigns: [],
-        favorites: [],
-        filterType: '',
-        loading: false,
-        init() {
-            this.loadCampaigns();
-            this.loadFavorites();
-        },
+        campaigns: [], favorites: [], filterType: '', loading: false,
+        types: [{value:'FULL_REDUCTION',label:'满减'},{value:'DISCOUNT',label:'折扣'},{value:'NO_THRESHOLD',label:'无门槛'},{value:'ADD_ON',label:'加购'},{value:'CATEGORY',label:'品类'},{value:'NEWCOMER',label:'新人'},{value:'TIME_LIMITED',label:'限时'}],
+        init() { this.loadCampaigns(); this.loadFavorites(); },
         async loadCampaigns() {
             this.loading = true;
             let url = '/api/campaigns?active=true';
             if (this.filterType) url += '&type=' + this.filterType;
-            try {
-                const r = await fetch(url);
-                const d = await r.json();
-                if (d.success) this.campaigns = d.data.items;
-            } catch(e) {}
+            try { const r = await fetch(url); const d = await r.json(); if (d.success) this.campaigns = d.data.items; } catch(e) {}
             this.loading = false;
         },
-        async loadFavorites() {
-            try {
-                const r = await fetch('/api/favorites');
-                const d = await r.json();
-                if (d.success) this.favorites = d.data.items.map(f => f.campaign_id);
-            } catch(e) {}
-        },
+        async loadFavorites() { try { const r = await fetch('/api/favorites'); const d = await r.json(); if (d.success) this.favorites = (d.data.items||[]).map(f=>f.campaign_id); } catch(e) {} },
         isFavorited(id) { return this.favorites.includes(id); },
-        async toggleFavorite(id) {
-            if (this.isFavorited(id)) {
-                await fetch('/api/favorites/' + id, {method:'DELETE'});
-                this.favorites = this.favorites.filter(f => f !== id);
-            } else {
-                await fetch('/api/favorites', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({campaign_id:id})});
-                this.favorites.push(id);
-            }
-        },
-        async claimCoupon(id) {
-            const r = await fetch('/api/coupons/claim', {
-                method: 'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({campaign_id: id})
-            });
-            const d = await r.json();
-            if (d.success) {
-                alert('领取成功！券码: ' + d.data.coupon_code);
-                this.loadCampaigns();
-            } else {
-                alert(d.error.message);
-            }
-        },
-        typeLabel(t) {
-            const m = {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'};
-            return m[t]||t;
-        },
-        typeColor(t) {
-            const m = {FULL_REDUCTION:'bg-red-100 text-red-700',DISCOUNT:'bg-purple-100 text-purple-700',NO_THRESHOLD:'bg-green-100 text-green-700',ADD_ON:'bg-orange-100 text-orange-700',CATEGORY:'bg-blue-100 text-blue-700',NEWCOMER:'bg-pink-100 text-pink-700',TIME_LIMITED:'bg-yellow-100 text-yellow-700'};
-            return m[t]||'bg-gray-100 text-gray-700';
-        },
-        paramText(c) {
-            const p = c.params;
-            if (c.type==='FULL_REDUCTION') return '满' + p.threshold + '减' + p.discount;
-            if (c.type==='DISCOUNT') return (p.discount_rate*10) + '折';
-            if (c.type==='NO_THRESHOLD') return '直减' + p.discount + '元';
-            return '';
-        }
+        async toggleFavorite(id) { if (this.isFavorited(id)) { await fetch('/api/favorites/'+id,{method:'DELETE'}); this.favorites=this.favorites.filter(f=>f!==id); } else { await fetch('/api/favorites',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaign_id:id})}); this.favorites.push(id); } },
+        async claimCoupon(id) { const r = await fetch('/api/coupons/claim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaign_id:id})}); const d = await r.json(); if (d.success) { alert('领取成功！券码: '+d.data.coupon_code); this.loadCampaigns(); } else { alert(d.error.message); } },
+        typeLabel(t) { return {FULL_REDUCTION:'满减',DISCOUNT:'折扣',NO_THRESHOLD:'无门槛',ADD_ON:'加购',CATEGORY:'品类',NEWCOMER:'新人',TIME_LIMITED:'限时'}[t]||t; },
+        typeColor(t) { return {FULL_REDUCTION:'bg-red-50 text-red-600',DISCOUNT:'bg-purple-50 text-purple-600',NO_THRESHOLD:'bg-emerald-50 text-emerald-600',ADD_ON:'bg-orange-50 text-orange-600',CATEGORY:'bg-primary-50 text-primary-600',NEWCOMER:'bg-pink-50 text-pink-600',TIME_LIMITED:'bg-amber-50 text-amber-600'}[t]||'bg-slate-100 text-slate-600'; },
+        paramText(c) { const p=c.params; if(c.type==='FULL_REDUCTION') return '满'+p.threshold+'减'+p.discount; if(c.type==='DISCOUNT') return (p.discount_rate*10)+'折'; if(c.type==='NO_THRESHOLD') return '直减'+p.discount+'元'; return ''; }
     }
 }
 </script>
