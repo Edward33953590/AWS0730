@@ -120,7 +120,12 @@ function createCampaign() {
             this.aiLoading=true; this.aiCopy={}; this.aiError='';
             const r=await fetch('/api/ai/generate-copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:this.form.type,params:this.form.params,context:this.form.name})});
             const d=await r.json();
-            if(d.success && d.data.source!=='error') { this.aiCopy=d.data; } else { this.aiError=(d.data&&d.data.error)||'AI调用失败'; }
+            if(d.success && d.data.source!=='error') {
+                this.aiCopy=d.data;
+                // 自动填入表单
+                if(d.data.title) this.form.name=d.data.title;
+                if(d.data.description) this.form.description=d.data.description;
+            } else { this.aiError=(d.data&&d.data.error)||'AI调用失败'; }
             this.aiLoading=false;
         },
         applyCopy() { if(this.aiCopy.title) this.form.name=this.aiCopy.title; if(this.aiCopy.description) this.form.description=this.aiCopy.description; },

@@ -436,3 +436,31 @@ T-003 → T-011 → T-012/T-013/T-014/T-015
 - 实时大屏使用深色渐变主题（`from-slate-900 via-purple-900`），适合投影演示
 - AI效果对比使用预设演示数据（标注说明），后续可接入真实埋点
 - 团队贡献墙使用硬编码占位成员（成员A-E），团队确认后替换真实信息
+
+
+---
+
+## 2026-07-30 AI服务层迁移：AWS Bedrock → DeepSeek API
+
+### 变更内容
+- 将所有 AI 调用从 AWS Bedrock 替换为 DeepSeek API（通过 OpenAI 兼容客户端）
+- 原因：AWS Bedrock 因网络问题无法连接，改用 DeepSeek 作为 AI 后端
+
+### 技术决策
+- 使用 OpenAI Python SDK 调用 DeepSeek API（DeepSeek 提供 OpenAI 兼容接口）
+- 保持 `bedrock_service.py` 文件名和单例接口（`converse()` / `generate_json()`）不变，所有调用方无需修改
+- 默认模型：`deepseek-v4-flash`
+- 移除 boto3 依赖，新增 openai 依赖
+
+### 受影响的文件
+- `coupon-center/services/bedrock_service.py` — 完全重写，使用 OpenAI 客户端调用 DeepSeek
+- `coupon-center/config.py` — 移除 AWS 相关配置，新增 DEEPSEEK_API_KEY / DEEPSEEK_BASE_URL / DEEPSEEK_MODEL
+- `coupon-center/.env` — 替换 Bedrock 配置为 DeepSeek 配置
+- `coupon-center/.env.example` — 同步更新环境变量模板
+- `coupon-center/requirements.txt` — 移除 boto3，新增 openai>=1.30.0
+
+### 未变更的文件（接口兼容，无需修改）
+- `services/ai_copy_service.py`
+- `services/ai_profile_service.py`
+- `services/ai_recommend_service.py`
+- `services/risk_engine.py`
